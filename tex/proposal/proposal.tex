@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Evaluating the Automatic Segmentation of Subtitles}
+\author{François Buet$^1$ \and Mauro Cettolo$^2$ \and Alina Karakanta$^2$ \and  Matteo Negri$^2$ \and  Marcho Turchi$^2$ \and  Francois Yvon$^1$}
+
+%\address{
+%$^1$ Université Paris-Saclay, CNRS, LISN, Orsay, France \\
+%$^2$ Fundazione Bruno Kessler, Trento, Italy
+%}
+\date{March 2021}
+
+\begin{document}
+
+\maketitle
+
+The goal of this project is to survey existing metrics for evaluating the quality of automatic captioning / subtitling\footnote{Henceforth, we will use both terms as equivalent.} technology with respect to the segmentation of the text that is displayed on the user's terminal window.
+
+For the purpose of this study, we use the term \emph{(closed) caption} to refer to a textual segment that is  displayed on screen simultaneously with the speech. A caption may span one or several \emph{lines}; it may correspond to one or several complete linguistic utterance(s); conversely an utterance can span more than one captions. We do not distinguish below between same-language and bilingual captions, even though the generation of the latter is arguably more challenging that the former.
+
+\section{How does Automatic Subtitling work ?}
+
+\subsection{From audio to captions}
+With the progress of deep learning technologies for Automatic Speech Recognition (ASR), Automatic Text Simplification (ATS) and Machine Translation (MT) systems, the automatic generation of adapted subtitles is slowly turning into a viable application of these technologies. From a high-level perspective, AST combines several processing steps: speech transcription and normalization (recapitalization, punctuation), text compression and/or simplification\footnote{Text compression aims to make the text shorter in length, while simplification is intended as making the text more accessible to users with reading disabilities, but also to language learners.} and translation. In a more complete pipeline, additional processing steps would also involve speaker diarization (for display on screen at speaker turns), language identification, characterization of non-speech events (background noise, music, specific sounds) to inform description of the audio, etc. Note that while we have described  the subtitling process as a series of steps, 
+%a lot of 
+recent efforts have focused on combining some of these steps into end-to-end architectures \cite{liu-etal-2020-adapting,lakew-et-al-2019,niehues-2020}.   
+
+In the pipeline view, the final step consists in segmenting the output text and preparing it for display. Segmentation is a two-level process: (a) the textual stream is chunked into cohesive chunks that will be displayed on screen in the caption box simultaneously with the speech; (b) each caption can span over one or two lines of text. Segmentation is subject to multiple constraints: each textual fragment has a maximum size of approximately 40 characters, depending on the norm;\footnote{The French official recommendation for TV shows is 36~characters, the recommendation for TedTalks or Netflix is 42, etc.} the caption must remain on screen for a sufficiently long time to enable reading;\footnote{This means that the word or character display rate should be kept within reasonable bounds - a typical value for the latter would be 16~char / second, with high variability across languages and scripts.} it has to be synchronized with the audio, and also with the image of the speaker; the segmentation in lines has to obey basic linguistic rules such as preserving major syntactic boundaries, notwithstanding other aesthetic requirements (the second line should be longer than the first, they have to be balanced in length, etc.). All these constraints can be conflicting, and full conformity to all requirements may not always be achievable. In such situations, deciding which constraint(s) should take precedence is also a complex process, the final judge being the viewer's perception of the overall fluency of the process, which should eventually interfere with the viewing experiment as little as possible.
+
+\subsection{Evaluating captioning}
+
+As for all complex Natural Language Processing pipelines, it is critical to precisely evaluate both the whole process (eg.\ via user studies as in \cite{Koponen21bridge}) but also each individual component \cite{alvarez-et-al-2016}, so as to know which is (are) the most problematic part(s) of the process. Speech-to-Text (including normalization and repunctuation) is typically evaluated with the Word Error Rate (WER) score \cite{NIST03evalplan}, and assuming the availability of manual, verbatim (error-free), transcriptions, its impact on the final result can easily be singled out. Machine Translation is typically automatically evaluated with reference-based metrics such as BLEU \cite{Papineni02bleu}, Meteor \cite{Banerjee05meteor} or Translation Error Rate (TER) \cite{Snover06study}, likewise, for text compression / simplification, the SARI metric has been proposed in \cite{Wei16optimizing}.
+
+In this study, we are interested in the evaluation of the output segmentation - no matter how it was performed, either jointly with the textual content, or in a separate post-processing step \cite{Matusov19customizing}.
+
+For pipeline systems where the segmentation is a separate step, the problem can be formulated as follows: given a perfect, error-free, written version of the  subtitle textual content, possibly associated with time codes from the speech recognition phase and with speaker IDs, generate a segmentation into subtitles and lines with time codes corresponding to their display times on screen. 
+
+For more integrated (e.g.\ end-to-end) systems, which simultaneously generate textual content (simplification / translation) and segmentation boundaries in one go, separately evaluating the segmentation quality may prove more difficult, requiring to regenerate an ideal textual content based on alignment with the reference caption. This is because performing alignment based on the sole text can be difficult, especially in multilingual settings.
+
+Having set the stage, we now turn to existing metrics for segmentation evaluation. 
+
+\subsection{Evaluating segmentation in Natural Language Processing}
+Evaluating segmentation is a recurring problem in Natural Language Processing (NLP) and occurs in several contexts and with various degrees of granularity:
+\begin{itemize}
+\item segmenting a speech or video stream into coherent passages, as is sometimes needed for indexing purposes \cite{Hearst97textiling};
+\item segmenting a text into sentences - this can be performed with rule-based architectures or with machine learning techniques;
+\item segmenting an audio utterance into words, as is done, for instance, in studies on language acquisition from unsegmented speech \cite{Goldwater09bayesian};
+\item segmenting a word in morphemes as is done in unsupervised segmentation tasks \cite{Creutz02unsupervised}.
+\end{itemize}
+
+Given a reference segmentation, a number of standard evaluation metrics have been proposed in the literature and can readily be used, such as:
+\begin{itemize}
+\item the proportion of fully correct segments. This metric is extremely strict, as erring on one segment boundary will yield two errors;
+\item precision/recall/F1 metrics for segment boundaries. These metrics are based on an annotation of text tokens as being either segment initial or segment internal (which is the most common label), and evaluate only segment initial tokens \cite{Goldwater09bayesian};
+\item window-based metrics also take into account the distance between the proposed and reference boundaries \cite{Beeferman99statistical,Pevzner02critique}, or compute the average overlap between actual and predicted segments;
+\item other variations of the edit-distance between linear representations of two segmentations, also accounting for near misses and multiple segmentation types have also been studied in \cite{Fournier12segmentation,Fournier13evaluating,Martinez-Hinarejos15unsegmented};
+\end{itemize}
+
+Segmenting subtitles shares a lot with the tasks listed above, and could be evaluated with the same types of tools and metrics: for instance, \cite{Scaiano10automatic} use the WindowDiff approach of \cite{Pevzner02critique} to evaluate their system. A comprehensive survey of metrics that have been derived from the same principles is reviewed in \cite{Alvarez17improving}, with the aim to separately evaluate the segmentation component.
+
+Realizing the limitations of reference-based evaluations, recent work on automatic subtitling has introduced alternative metrics that draw their inspiration mostly from the MT literature \cite{Matusov19customizing,Karakanta20is42}. In these proposals, the captioning system output is evaluated in various forms: as raw text, to be aligned with a reference at the utterance level, as text segmented in subtitles, to be aligned and scored against reference captions, or segmented in lines, to be aligned and scored at the line level. An alternative is to generate and insert overt segmentation marks in the output and directly compute BLEU or TER scores over these generalized outputs. This is proposed in \cite{Matusov19customizing}, who report three variants of the BLEU and TER scores. \cite{Karakanta20is42} also evaluates subtitles with and without line breaks; in addition, this paper also computes a pseudo-TER score which ignores token errors as a proxy of the re-segmentation human effort. As TER does not penalize the length of moves, it is unclear how this score actually distinguishes between near and large segmentation errors.\footnote{Note that in principle, the near / large distinction should be computed based on syntax-based, rather than linear distances. Indeed, a mark insertion close to the optimal position but breaking a syntactic constituent can be much worse than a more distant insertion preserving linguistic wholes' integrity.}
+
+\section{Objectives \label{sec:objectives}}
+
+The main goal of this project is to conduct a comprehensive survey of the subtitle segmentation metrics in order to understand their respective biases and strengths. As metrics are often used to drive developments and innovations, choosing the right metric is essential to moving the research in the right direction. In particular, we intend to better relate ``classical'' segmentation metrics (based on F1-scores) and the new proposals formulated in the captioning task. 
+
+Our objective is two-fold: (a) to better understand and characterize the biases and limitations of existing segmentation metrics; (b) to propose alternative evaluation schemes, that should ideally be applicable irrespective of the underlying segmentation approach (i.e.\ using a separate vs.\ integrated segmentation scheme).  
+
+Among the questions we intend to study is:
+\begin{itemize}
+    \item how to best combine the multiple constraints that weight on subtitles into one single metric?
+    \item how to take the intrinsic variability of (manual) subtitle boundaries into account?
+    \item how to account for the hierarchical structure of captions (utterances $>$ captions $>$ lines)? 
+    \item how to distinguish near correct from really bad outputs with MT-like metrics?
+    \item how to improve reference based-metrics to better capture the various symbolic constraints (syntactic consistency, length, display rate)?
+    \item can we use the same metrics for end-to-end and for pipeline systems?
+    \item can we use reference-based evaluations for automatic captioning, where the lexical content of the reference may not match that of the generated text?
+    \item is it possible to train ML-based metrics where we would learn to optimally combine multiple partial assessments as is typically done in Quality Estimation? We would need data for this; does this exist?
+    \item how can we use contrastive pairs to evaluate segmentations (force decoding the lexical content and measuring the likelihood of correct / wrong segmentations)?
+\end{itemize}
+
+\section{Tangible outcomes \label{sec:outcome}}
+
+The tangible outcomes for this project will be:
+\begin{itemize}
+    \item a comparison of existing metrics on several tasks (intralingual and interlingual subtitling) and an analysis of their respective biases;
+    \item proposal for new evaluation metrics, associated with tools to compute these scores from hypothetical subtitles;
+    \item a conference article summarizing the main findings to be submitted in 2021 (possible targets are conferences in the area of Machine Translation, Speech or Human Processing);
+    \item other ?
+\end{itemize}
+
+\section{Participating teams and efforts}
+
+The spoken language processing group at LISN (CNRS and Univ. Paris-Saclay) has been working on the various steps of the subtitling process (ASR, MT, AST) for a number of years. CNRS is currently collaborating with the French public TV in a large scale project where automatic subtitling plays an important part, and is thus in a position to conduct experiments with an actual (monolingual) subtitling task (from raw speech to production-ready subtitle files in French), and possibly [TBD] to also collect user feedback on the quality of the resulting subtitles.
+
+FBK takes part in this project with the Machine Translation (MT) unit that has a long tradition in textual and speech translation. In the recent years, the MT unit has taken part in four different projects on the creation and evaluation of intra- and interlingual subtitles that should be conform to the customer guidelines and of high translation quality. In this project, the MT unit focuses on segmenting the text produced by the ASR into proper subtitles,  on translating the source language subtitles into the target language without losing guideline coherence and on collecting subtitling data to foster the research on subtitling evaluation. FBK is in a position to run experiments with an intralingual subtitling tool (from eleven source languages to eleven target languages) and to make available a tool for post-editing tasks.
+
+[TBD] Systran is also interested to take part to this discussion and we may want to also associate them to this project as external industrial collaborators
+
+\bibliographystyle{plain}
+\bibliography{../../bib/biblio}
+
+\end{document}
