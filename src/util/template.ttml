@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="fr" xmlns:ttm="http://www.w3.org/ns/ttml#metadata" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling">
+  <head>
+    <metadata>
+      <ttm:title>une clef ici</ttm:title>
+    </metadata>
+    <styling>
+      <style xml:id="captionStyle" tts:fontFamily="proportionalSansSerif" tts:fontSize="30px" tts:backgroundColor="transparent" tts:textAlign="center" tts:displayAlign="center" tts:extent="100% 20%" tts:origin="0% 75%" tts:textOutline="black 1px 0px"/>
+    </styling>
+    <layout>
+      <region style="captionStyle" xml:id="region2"/>
+    </layout>
+  </head>
+  <body>
+    <div region="region2">
+    </div>
+  </body>
+</tt>
