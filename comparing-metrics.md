@@ -48,11 +48,13 @@ Proportion of boundaries that are not transformed (added/deleted, substituted) w
 ### BLEU(-br)
 
 [karakanta2042](https://www.aclweb.org/anthology/2020.iwslt-1.26.pdf)
+
 BLEU computed with the data containing breaks as special symbols. Each break symbol counts as an extra token that contributes to the score.
 
 ### TER-br
 
 [karakanta2042](https://www.aclweb.org/anthology/2020.iwslt-1.26.pdf)
+
 TER calculated with all tokens of the sentence masked.
 
 ### S mode BLEU (S-BLEU)
@@ -64,6 +66,7 @@ Subtitle BLEU. Calculates BLEU on subtitles instead of sentences, so that any ta
 ### Timed BLEU (T-BLEU)
 
 [Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
+
 Target-reference segment pairs are created by linear temporal alignment, over which BLEU is calculated normally.
 
 ### T-BLEU Headroom (TBHR)
