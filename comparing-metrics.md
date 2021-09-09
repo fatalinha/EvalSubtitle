@@ -8,7 +8,10 @@
 | Segmentation Similarity | :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
 | Boundary Similarity     | :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
 | BLEU(-br)               | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [SacreBLEU](https://github.com/mjpost/sacrebleu)? | 
-| TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    |                |
+| TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [TER](https://www.cs.umd.edu/~snover/tercom/)        |
+| S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
+| T-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | | 
+| TBHR | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | | 
 
 ### Pk
 
@@ -41,6 +44,32 @@ Proportion of boundaries that are not transformed (added/deleted, substituted) w
 ### Boundary Similarity
 
 [Fournier13evaluating](https://www.aclweb.org/anthology/P13-1167.pdf)
+
+### BLEU(-br)
+
+[karakanta2042](https://www.aclweb.org/anthology/2020.iwslt-1.26.pdf)
+BLEU computed with the data containing breaks as special symbols. Each break symbol counts as an extra token that contributes to the score.
+
+### TER-br
+
+[karakanta2042](https://www.aclweb.org/anthology/2020.iwslt-1.26.pdf)
+TER calculated with all tokens of the sentence masked.
+
+### S mode BLEU (S-BLEU)
+
+[Matusov19customizing](https://www.aclweb.org/anthology/W19-5209.pdf)
+
+Subtitle BLEU. Calculates BLEU on subtitles instead of sentences, so that any target words that appear in the wrong subtitle count as error. Assumes that the subtitles in the target and the reference match.
+
+### Timed BLEU (T-BLEU)
+
+[Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
+Target-reference segment pairs are created by linear temporal alignment, over which BLEU is calculated normally.
+
+### T-BLEU Headroom (TBHR)
+[Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
+
+Difference between upper bound of T-BLEU and actual T-BLEU. The upper bound is calculated as follows: The system’s predicted subtitle boundaries are ignored, and instead the unsegmented translation is aligned with the reference subtitles by minimizing WER. This gives subtitle boundaries that approximately maximize T-BLEU. This is a lower-is-better boundary error rate, interpretable as the amount of T-BLEU that could be recovered by improving only the poition of the boundaries.
 
 # Comparing metrics on contrastive pairs
 
