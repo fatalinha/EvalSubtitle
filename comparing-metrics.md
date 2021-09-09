@@ -45,6 +45,11 @@ Proportion of boundaries that are not transformed (added/deleted, substituted) w
 
 [Fournier13evaluating](https://www.aclweb.org/anthology/P13-1167.pdf)
 
+New weights and new normalization for boundary edit distance.
+Assuming that boundary edit distance produces sets of edit operations where *A* is the set of additions/deletions, *T* the set of *n*-wise transpositions, *S* the set of substitutions, and *M* the set of matching boundary pairs, boundary similarity can be defined as:
+
+![formula](https://render.githubusercontent.com/render/math?math=B(s_a,s_b,n)=1-\frac{|A|%2Bw_t^{span}(T,n)%2Bw_s^{ord}(S,n)}{|A|%2B|T|%2B|S|%2B|M|})
+
 ### BLEU(-br)
 
 [karakanta2042](https://www.aclweb.org/anthology/2020.iwslt-1.26.pdf)
@@ -94,3 +99,7 @@ Possible rules to use for crafting an error example from a reference:
 # Adapting standard metrics via alignment
 
 # Probing approaches
+
+### Forced decoding
+
+To circumvent the difficulty of evaluating segmentation when the hypothesis sequence differs from the reference sequence, one could force the system to only insert boundaries in a given sequence during decoding.
