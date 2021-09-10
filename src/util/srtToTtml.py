@@ -2,7 +2,7 @@
 
 DESCRIPTION = """
 A script to convert subtitles from an srt file to a ttml file.
-The color of le lines (not contained in srt) will be set to white by default.
+The color of the lines (not contained in srt) will be set to white by default.
 """
 
 import argparse

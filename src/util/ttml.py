@@ -8,7 +8,11 @@ import os
 import re
 import xml.etree.ElementTree as ET
 
-import textstat
+try:
+    import textstat
+    FRE = True
+except ImportError:
+    FRE = False
 
 COLOR_FILTER = frozenset(['magenta', 'red'])
 MAX_CPL = 36
@@ -352,7 +356,7 @@ def make_sub_stats(ttml_file_path):
     filtered_all_sub = re.sub(r" %s+" % MASK_CHAR, r"", filtered_all_sub)
 
     n_filtered_sub_chars = len(filtered_all_sub)
-    sub_fre_score = textstat.flesch_reading_ease(filtered_all_sub)
+    sub_fre_score = textstat.flesch_reading_ease(filtered_all_sub) if FRE else -1
 
     # Full subtitles
     ttml_reader.reinit()
