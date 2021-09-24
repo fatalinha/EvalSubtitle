@@ -121,6 +121,7 @@ class TtmlReader:
         self.masking = masking
         self.color_filter = COLOR_FILTER
         # For statistics
+        self.n_filled_captions = 0
         self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0), ('white', 0)])
         self.n_over_cpl_lines = 0
         self.n_over_cps_captions = 0
@@ -134,6 +135,7 @@ class TtmlReader:
         self.line_next_index = 0
         
         # For statistics
+        self.n_filled_captions = 0
         self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0), ('white', 0)])
         self.n_over_cpl_lines = 0
         self.n_over_cps_captions = 0
@@ -190,7 +192,8 @@ class TtmlReader:
         #print("\tRead caption", self.caption_next_index)#DEBUG#
         if self.is_file_over():
             return '' if flat else []
-        
+
+        self.n_filled_captions +=1
         lines = list()
         caption_current_index = self.caption_next_index
         
@@ -236,9 +239,13 @@ class TtmlReader:
     
     def set_masking(self, masking):
         self.masking = masking
-    
-    def n_captions(self):
-        return len(self.root[1][0])
+
+    # Call after read_all()
+    def n_captions(self, filled=True):
+        if filled:
+            return self.n_filled_captions
+        else:
+            return len(self.root[1][0])
     
     # Call after read_all()
     def n_lines(self, filtered=True):
