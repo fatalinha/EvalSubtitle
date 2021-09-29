@@ -94,6 +94,10 @@ Possible rules to use for crafting an error example from a reference:
 - insert new boundaries into free slots, and/or remove existing boundaries
 - change the type of a boundary (end-of-line/end-of-block)
 
+Length-based segmentation (before max. number of characters is reached).
+
+Sequence-to-Sequence segmenter
+
 # Evaluating without references
 
 # Adapting standard metrics via alignment
