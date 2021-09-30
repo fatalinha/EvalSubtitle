@@ -18,8 +18,8 @@ COLOR_FILTER = frozenset(['magenta', 'red'])
 MAX_CPL = 36
 MAX_CPS = 15
 MASK_CHAR = '#'
-LINE_TAG = '<br>'
-CAPTION_TAG = '<p>'
+LINE_TAG = '<eol>'
+CAPTION_TAG = '<eob>'
 TTML_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'template.ttml')
 
 ET.register_namespace('', 'http://www.w3.org/ns/ttml')
@@ -423,6 +423,23 @@ def make_sub_stats(ttml_file_path):
 
     return sub_stats
 
+
+def ttml_to_tagged_str(ttml_file_path, filtering=True, masking=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+    ttml_reader = TtmlReader(ttml_file_path, filtering=filtering, masking=masking)
+
+    captions = list()
+    time_spans = list()
+    while not ttml_reader.is_file_over():
+        caption = ttml_reader.read_caption(flat=False)
+        captions.append(caption)
+        time_span = '%s %s' % ttml_reader.current_time_span()
+        time_spans.append(time_span)
+
+    all_sub = caption_tag.join([line_tag.join(caption) for caption in captions]) + caption_tag
+    all_sub = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", all_sub).strip()
+
+    return all_sub, time_spans
+
 ## MAIN FUNCTIONS  #############################################################
 
 def read_sub(ttml_file_path, text_file_path, filtering=True, masking=False):
@@ -450,30 +467,21 @@ def read_sub(ttml_file_path, text_file_path, filtering=True, masking=False):
 def ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path, filtering=True, masking=False,
                        line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
     print('Converting ttml into tagged text:')
-    print('Initializing...')
-    ttml_reader = TtmlReader(ttml_file_path, filtering=filtering, masking=masking)
-    
     print('Reading file...')
-    captions = list()
-    time_spans = list()
-    while not ttml_reader.is_file_over():
-        caption = ttml_reader.read_caption(flat=False)
-        captions.append(caption)
-        time_span = '%s %s' % ttml_reader.current_time_span()
-        time_spans.append(time_span)
-    
-    all_sub = caption_tag.join([line_tag.join(caption) for caption in captions]) + caption_tag
+    all_sub, time_spans = ttml_to_tagged_str(ttml_file_path, filtering=filtering, masking=masking, line_tag=line_tag,
+                                             caption_tag=caption_tag)
     
     print('Segmenting into sentences...')
-    sub_eos_positions = [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?%s])([")])?%s' % (MASK_CHAR, caption_tag), all_sub)]  # "'MASK_CHAR''caption_tag'" compte comme fin de phrase à cause du masquage
+    sub_eos_positions = [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?%s])([")])?( )?%s' % (MASK_CHAR, caption_tag), all_sub)]  # "'MASK_CHAR' 'caption_tag'" compte comme fin de phrase à cause du masquage
 
     sub_segments = list()
     start_pos = 0
     for end_pos in sub_eos_positions:
         sub_segment = all_sub[start_pos:end_pos]
+        sub_segment = sub_segment.strip()
         sub_segments.append(sub_segment)
         start_pos = end_pos
-    
+
     print('Writing...')
     write_lines(sub_segments, tagged_txt_file_path)
     write_lines(time_spans, timecode_file_path)
@@ -485,7 +493,9 @@ def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path,
     ttml_writer = TtmlWriter(ttml_file_path)
     
     print('Reading files...')
-    tagged_txt = open(tagged_txt_file_path, 'r').read()
+    tagged_txt = ' '.join([line.strip() for line in open(tagged_txt_file_path, 'r').readlines()])
+    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    tagged_txt = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_txt)
     captions = [caption.strip().split(line_tag) for caption in tagged_txt.split(caption_tag)[:-1]]
     
     timecode_lines = open(timecode_file_path, 'r').readlines()
