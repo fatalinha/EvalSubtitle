@@ -23,7 +23,7 @@ def get_masses(file_path, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG
     Get the boundary segmentation from a segmented subtitle file.
 
     :param file_path: segmented subtitle file (ttml or tagged text)
-    :param ttml: wether file_path is in ttml format
+    :param ttml: whether file_path is in ttml format
     :param line_tag: end of line boundary tag
     :param caption_tag: end of caption/block boundary tag
     :return: segmentation masses (segeval.BoundaryFormat.mass format)
