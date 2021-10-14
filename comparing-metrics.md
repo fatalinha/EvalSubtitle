@@ -9,9 +9,9 @@
 | Boundary Similarity     | :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
 | BLEU(-br)               | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [SacreBLEU](https://github.com/mjpost/sacrebleu)? | 
 | TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [TER](https://www.cs.umd.edu/~snover/tercom/)        |
-| S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
-| T-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | | 
-| TBHR | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | ???    | | 
+| S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark: | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
+| T-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark: | | 
+| TBHR | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:  | | 
 
 ### Pk
 
@@ -77,7 +77,7 @@ Target-reference segment pairs are created by linear temporal alignment, over wh
 ### T-BLEU Headroom (TBHR)
 [Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
 
-Difference between upper bound of T-BLEU and actual T-BLEU. The upper bound is calculated as follows: The system’s predicted subtitle boundaries are ignored, and instead the unsegmented translation is aligned with the reference subtitles by minimizing WER. This gives subtitle boundaries that approximately maximize T-BLEU. This is a lower-is-better boundary error rate, interpretable as the amount of T-BLEU that could be recovered by improving only the poition of the boundaries.
+Difference between upper bound of T-BLEU and actual T-BLEU. The upper bound is calculated as follows: The system’s predicted subtitle boundaries are ignored, and instead the unsegmented translation is aligned with the reference subtitles by minimizing WER. This gives subtitle boundaries that approximately maximize T-BLEU. This is a lower-is-better boundary error rate, interpretable as the amount of T-BLEU that could be recovered by improving only the position of the boundaries.
 
 # Comparing metrics on contrastive pairs
 
