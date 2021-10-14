@@ -2,12 +2,13 @@
 
 ## \<eol> + \<eob> segmentation
 
-| System       | window_size | ↓Pk    | ↓WindowDiff | ↑Precision | ↑Recall | ↑F1  | ↑BLEU |↑BLEUsame|↓TER-br| TER-same|
-|--------------|-------------|--------|-------------|------------|---------|------|-------|---------|-------|---------|
-| every42chars | 3           | 0.353  | 0.387       | 0.379      | 0.328   |0.352 | 63.81 | 66.08   | 12.59 | 10.40 |
-| Segmenter    | 3           | 0.142  | 0.150       | 0.807      | 0.776   |0.791 | 87.80 | 89.57   | 4.79  | 3.77  |
+| System       | window_size | ↓Pk    | ↓WindowDiff | ↑Precision | ↑Recall | ↑F1  | ↑BLEU |↓TER-br| ↑Len |
+|--------------|-------------|--------|-------------|------------|---------|------|-------|-------|------|
+| every42chars | 3           | 0.353  | 0.387       | 0.379      | 0.328   |0.352 | 63.81 | 12.59 | 100\%|
+| Segmenter    | 3           | 0.142  | 0.150       | 0.807      | 0.776   |0.791 | 87.80 | 4.79  | 93\% |
 
-*Note: BLEU and TER take into account the type of break here (no replacement with <eox>). TER-br on untokenised text.
+*Note: BLEU and TER take into account the type of break here (no replacement with \<eox>). TER-br on untokenised text.
+*BLEU_same 66.08/89.57, TER_same 10.40/3.77.
   
 ## \<eob> only segmentation
 
