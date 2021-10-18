@@ -1,7 +1,7 @@
 # coding: utf-8
 
 DESCRIPTION = """
-A scrict to degrade subtitle segmentation (in lines and captions) in a ttml file.
+A script to degrade subtitle segmentation (in lines and captions) in a ttml file.
 The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing
 boundaries with the other type.
 """
@@ -381,7 +381,7 @@ def parse_args():
     parser.add_argument('mode', type=str, choices=['shift', 'add', 'delete', 'replace'])
 
     parser.add_argument('--input_file', '-if', type=str,
-                        help="ttml files to degrade")
+                        help="ttml file to degrade")
     parser.add_argument('--output_file', '-of', type=str,
                         help="degraded ttml file")
 
