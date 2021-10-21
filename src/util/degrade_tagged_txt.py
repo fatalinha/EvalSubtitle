@@ -114,6 +114,9 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=LINE_TAG,
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
+    stats = [n_eol, n_eob, n_eol_shifts, n_eob_shifts]
+    return stats
+
 ## ADD  ########################################################################
 
 def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
@@ -154,6 +157,9 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
+    stats = [n_eol, n_eob, n_eol_additions, n_eob_additions]
+    return stats
+
 ## DELETE  #####################################################################
 
 def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
@@ -188,6 +194,8 @@ def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, c
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+    stats = [n_eol, n_eob, n_eol_deletions, n_eob_deletions]
+    return stats
 
 ## REPLACE  ####################################################################
 
@@ -226,6 +234,8 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+    stats = [n_eol, n_eob, n_eol_replacements, n_eob_replacements]
+    return stats
 
 ## MAIN  #######################################################################
 

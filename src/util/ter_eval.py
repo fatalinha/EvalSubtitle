@@ -1,7 +1,7 @@
 # coding: utf-8
 from sacrebleu.metrics import TER
 
-DESCRIPTION = """Computes TER-br with and without replacement of type of breaks"""
+DESCRIPTION = """Computes TER_br with and without replacement of type of breaks"""
 
 
 def mask(infile, replace=False, remove_eol=False, remove_eob=False):
@@ -29,15 +29,16 @@ def mask(infile, replace=False, remove_eol=False, remove_eob=False):
 def calculate_ter(sys, ref):
     # Calculates TER between masked system output and masked reference
     ref1 = [(ref)]
-    ter = TER()
+    ter = TER(ref1)
     score = ter.corpus_score(sys, ref1)
     return score
 
 
 def ter_process(reference_file, system_file):
-    ref = mask(reference_file, replace=True)
-    sys = mask(system_file, replace=True)
+    ref = mask(reference_file, replace=False)
+    sys = mask(system_file, replace=False)
     ter_score = calculate_ter(sys, ref)
     print('TER score on masked text: ' + str(ter_score))
-    return ter_score
+    tr = float(str(ter_score).split('=')[1].lstrip())
+    return tr
 

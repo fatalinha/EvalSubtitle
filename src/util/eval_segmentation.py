@@ -123,6 +123,31 @@ def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_wind
 
     return results
 
+
+def get_metrics(sys_file_path, ref_file_path, ttml=False, eol_window_size=None, eob_window_size=None,
+             eox_window_size=None, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+
+    sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
+                                                                caption_tag=caption_tag)
+    ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, ttml=ttml, line_tag=line_tag,
+                                                                caption_tag=caption_tag)
+    print('<eol> + <eob> segmentation:')
+    # Window size is computed only if Pk or WindowDiff is computed
+    if eox_window_size is None:
+        eox_window_size = segeval.compute_window_size(ref_eox_masses)
+    print('  window_size =', eox_window_size)
+    # Case where Pk is computed
+    eox_pk = segeval.pk(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
+    print('  Pk = %.3f' % eox_pk)
+    pk = float(eox_pk)
+    # Case where WindowDiff is computed
+    eox_window_diff = segeval.window_diff(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
+    print('  WindowDiff = %.3f' % eox_window_diff)
+    window_diff = float(eox_window_diff)
+
+    return eox_window_size, pk, window_diff
+
+
 ## MAIN  #######################################################################
 
 def parse_args():

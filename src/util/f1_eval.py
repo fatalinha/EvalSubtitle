@@ -48,7 +48,7 @@ def evaluate_f1(reference_file, system_file, symbol, ttml=False, line_tag=LINE_T
         print("Precision: " + str(round(precision, 3)))
         print("Recall: " + str(round(recall, 3)))
         print("F1 score: " + str(round(f1, 3)))
-        return precision, recall, f1
+        return round(precision, 3), round(recall, 3), round(f1, 3)
 
 
 def parse_args():
