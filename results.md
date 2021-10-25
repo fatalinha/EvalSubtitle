@@ -9,6 +9,60 @@
 
 *Note: BLEU and TER take into account the type of break here (no replacement with \<eox>). TER-br on untokenised text.
 *BLEU_same 66.08/89.57, TER_same 10.40/3.77.
+
+<details>
+<summary>shift x graphs</summary>
+<br>
+  <p float="left">
+    <img src="/figs/Pk_eox=f(p_shift).png" height="250" />
+    <img src="/figs/WindowDiff_eox=f(p_shift).png" height="250" />
+    <img src="/figs/Precision_eox=f(p_shift).png" height="250" />
+    <img src="/figs/Recall_eox=f(p_shift).png" height="250" />
+    <img src="/figs/F1_eox=f(p_shift).png" height="250" />
+    <img src="/figs/BLEU_eox=f(p_shift).png" height="250" />
+  </p>
+</details>
+
+<details>
+<summary>add graphs</summary>
+<br>
+  <p float="left">
+    <img src="/figs/(Pk,WindowDiff)_eox=f(p_add).png" height="250" />
+    <img src="/figs/(Precision,Recall,F1)_eox=f(p_add).png" height="250" />
+    <img src="/figs/BLEU_eox=f(p_add).png" height="250" />
+  </p>
+</details>
+
+<details>
+<summary>delete graphs</summary>
+<br>
+  <p float="left">
+    <img src="/figs/(Pk,WindowDiff)_eox=f(p_delete).png" height="250" />
+    <img src="/figs/(Precision,Recall,F1)_eox=f(p_delete).png" height="250" />
+    <img src="/figs/BLEU_eox=f(p_delete).png" height="250" />
+  </p>
+</details>
+
+<details>
+<summary>replace graphs</summary>
+<br>
+  <p float="left">
+    <img src="/figs/(Pk,WindowDiff)_eox=f(p_replace).png" height="250" />
+    <img src="/figs/(Precision,Recall,F1)_eox=f(p_replace).png" height="250" />
+    <img src="/figs/BLEU_eox=f(p_replace).png" height="250" />
+  </p>
+</details>
+
+<details>
+<summary>compared operations graphs</summary>
+<br>
+  <p float="left">
+    <img src="/figs/WindowDiff_eox=f(p_operation).png" height="250" />
+    <img src="/figs/F1_eox=f(p_operation).png" height="250" />
+    <img src="/figs/BLEU_eox=f(p_operation).png" height="250" />
+  </p>
+</details>
+
   
 ## \<eob> only segmentation
 
