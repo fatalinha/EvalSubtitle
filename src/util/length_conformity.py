@@ -43,11 +43,15 @@ def len_process(system_file, max_len):
             conforming_subs += conf
             total_subs += tot
             mean_sub_len += mean
-        len_conf = round(conforming_subs / total_subs, 2)
-        print('Length conformity: ' + str(len_conf) +
-              ' Number of subtitles: ' + str(conforming_subs) + '/' + str(total_subs))
-        print('Mean subtitle length: ' + str(round(statistics.mean(mean_sub_len), 2)) +
-              ' Stdev:' + str(round(statistics.stdev(mean_sub_len), 2)))
+        try:
+            len_conf = round(conforming_subs / total_subs, 2)
+            print('Length conformity: ' + str(len_conf) +
+                  ' Number of subtitles: ' + str(conforming_subs) + '/' + str(total_subs))
+            print('Mean subtitle length: ' + str(round(statistics.mean(mean_sub_len), 2)) +
+                  ' Stdev:' + str(round(statistics.stdev(mean_sub_len), 2)))
+        except ZeroDivisionError:
+            len_conf = 0
+
         return len_conf
 
 
@@ -55,7 +59,7 @@ def main(args):
     system_file = args.system_file
     max_len = args.max_length
 
-    process(system_file, max_len)
+    len_process(system_file, max_len)
 
 
 if __name__ == '__main__':

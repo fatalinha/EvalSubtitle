@@ -10,9 +10,6 @@ from bleu_eval import bleu_process
 
 CAPTION_TAG = '<eob>'
 LINE_TAG = '<eol>'
-#reference_f = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'#sys.argv[1]
-#system_f = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/02_contrastive_pairs/shift/amara.shift.1.20'
-#outfile = sys.argv[3]
 
 
 def run_evaluation(reference_file, sys_file, metrics):
@@ -27,7 +24,7 @@ def run_evaluation(reference_file, sys_file, metrics):
     metrics['Win'].append(window)
     metrics['Pk'].append(round(pk, 3))
     metrics['WinDiff'].append(round(windiff, 3))
-    metrics['Precision'].append(precision)
+    metrics['Precision'].append(precision) #TODO: max val of pre,rec= 0.998
     metrics['Recall'].append(recall)
     metrics['F1'].append(f1)
     metrics['BLEU'].append(bleu)
@@ -36,8 +33,15 @@ def run_evaluation(reference_file, sys_file, metrics):
     metrics['Len'].append(len_conf)
     return metrics
 
-# write to csv
-#eval_metrics = dict(System=[], Win = [], Pk=[], WinDiff=[], Precision=[], Recall=[], F1=[], BLEU=[], TER_br=[],Len=[])
-#run_evaluation(reference_f, system_f, eval_metrics)
-#df = pd.DataFrame.from_dict(eval_metrics)
-#df.to_csv(outfile, index=False, header=False)
+
+def write_csv(outfile, metric_dic):
+    # write to csv
+    eval_metrics = dict(System=[], Win=[], Pk=[], WinDiff=[], Precision=[], Recall=[], F1=[],
+                        BLEU=[], TER_br=[], Len=[])
+    df = pd.DataFrame.from_dict(eval_metrics)
+    with open(outfile, 'w') as out:
+        df.to_csv(outfile, index=False, header=False)
+
+# TESTS
+#reference_f = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'
+#system_f = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/02_contrastive_pairs/shift/amara.shift.1.20'

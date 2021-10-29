@@ -11,9 +11,6 @@ path = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/02_contrastive_pairs/'
 reference = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'
 outfile = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/03_results/results.csv'
 
-# Run eval between same reference - toy
-#eval_ref = run_evaluation(reference, reference)
-#df = pd.DataFrame.from_dict(eval_ref)
 
 # Init dictionary to store metrics
 eval_metrics = dict(System=[], Mode=[], NU=[], P=[], Change=[],
@@ -22,7 +19,7 @@ eval_metrics = dict(System=[], Mode=[], NU=[], P=[], Change=[],
 
 # start degrading
 print('Start degrading files.')
-for mode in ['shift', 'add', 'delete', 'replace']:
+for mode in ['shift', 'add', 'delete', 'replace']: #'shift', 'add', 'delete',
     print('Mode: ' + mode)
     # new folder for each mode of degradation?
     outpath = join(path, mode)
