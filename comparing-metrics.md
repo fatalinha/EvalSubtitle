@@ -7,9 +7,9 @@
 | WindowDiff              | :heavy_check_mark:(1) | :x:                | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
 | Segmentation Similarity | :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
 | Boundary Similarity     | :heavy_check_mark:(1) | :heavy_check_mark: | :heavy_check_mark: | :x:                   | [SegEval](https://pypi.org/project/segeval/) |
-| BLEU(-br)               | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [SacreBLEU](https://github.com/mjpost/sacrebleu)? | 
-| TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:    | [TER](https://www.cs.umd.edu/~snover/tercom/)        |
-| S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark: | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
+| BLEU(-br)               | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:    | [SacreBLEU](https://github.com/mjpost/sacrebleu)? | 
+| TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:    | [TER](https://www.cs.umd.edu/~snover/tercom/)        |
+| S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
 | T-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark: | | 
 | TBHR | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:  | | 
 
@@ -100,7 +100,17 @@ Sequence-to-Sequence segmenter
 
 # Evaluating without references
 
+Segmentation at the highest node
+
+Chink-Chunk (POS-tags)
+
+Language model scoring (POS-based)
+
 # Adapting standard metrics via alignment
+
+Monotonic alignment of subtitles
+
+MWER (Matusov et al., 2006)
 
 # Probing approaches
 
