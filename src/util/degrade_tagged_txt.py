@@ -119,7 +119,8 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=LINE_TAG,
 
 ## ADD  ########################################################################
 
-def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG,
+        wrt_n_boundaries=False):
     """
     Degrade a tagged txt file by adding new boundaries.
 
@@ -129,6 +130,9 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
     :param p_eob: proportion of eob boundaries to be added
     :param line_tag: tag which represents an end-of-line in a caption (default '<eol>')
     :param caption_tag: tag which represents an end-of-caption (default '<eob>')
+    :param wrt_n_boundaries:
+        wether proportions are relative to the number of boundaries (True),
+        or to the number of free slots (False, default)
     """
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
@@ -139,8 +143,15 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
 
     n_eol = len(eol_positions)
     n_eob = len(eob_positions)
-    n_eol_additions = round(p_eol * n_eol)
-    n_eob_additions = round(p_eob * n_eob)
+    n_spaces = len(space_positions)
+    if wrt_n_boundaries:
+        n_eol_additions = round(p_eol * n_eol)
+        n_eob_additions = round(p_eob * n_eob)
+    else:
+        n_eol_additions = round(p_eol * n_spaces)
+        n_eob_additions = round(p_eob * n_spaces)
+    n_eol_additions = min(n_eol_additions, n_spaces)
+    n_eob_additions = min(n_eob_additions, n_spaces)
     print('n eol additions:\n  %d (%.2f%%)' % (n_eol_additions, 100 * n_eol_additions / n_eol))
     print('n eob additions:\n  %d (%.2f%%)' % (n_eob_additions, 100 * n_eob_additions / n_eob))
     boundaries_to_add = random.sample(space_positions, n_eol_additions + n_eob_additions)
@@ -255,6 +266,8 @@ def parse_args():
                         help="percentage of eol boundaries to be affected")
     parser.add_argument('--percentage_eob', '-peob', type=float, default=0.0,
                         help="percentage of eob boundaries to be affected")
+    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_spaces',
+                        help="wether proportions are relative to the number of boundaries, or to the number of free slots")
 
     args = parser.parse_args()
     return args
@@ -268,12 +281,13 @@ def main(args):
     n = args.n_units
     p_eol = args.percentage_eol / 100
     p_eob = args.percentage_eob / 100
+    wrt_n_boundaries = args.with_respect_to == 'n_bound'
 
     if mode == 'shift':
         shift(input_file_path, output_file_path, n, p_eol, p_eob)
 
     elif mode == 'add':
-        add(input_file_path, output_file_path, p_eol, p_eob)
+        add(input_file_path, output_file_path, p_eol, p_eob, wrt_n_boundaries=wrt_n_boundaries)
 
     elif mode == 'delete':
         delete(input_file_path, output_file_path, p_eol, p_eob)
