@@ -12,6 +12,7 @@ import segeval
 
 from util.ttml import ttml_to_tagged_str
 
+
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 PK = "pk"
@@ -19,10 +20,17 @@ WINDOW_DIFF = "window_diff"
 SEG_SIM = "segmentation_similarity"
 BOUND_SIM = "boundary_similarity"
 METRICS = frozenset({PK, WINDOW_DIFF, SEG_SIM, BOUND_SIM})
+EOB = "<eob>"
+EOL = "<eol>"
+EOX = "<eox>"
+EOB_EOL = "<eob>,<eol>"
+TYPES = frozenset({EOB, EOL, EOX, EOB_EOL})
+NT = 2
+
 
 def get_masses(file_path, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
     """
-    Get the boundary segmentation from a segmented subtitle file.
+    Get the segmentation masses from a segmented subtitle file.
 
     :param file_path: segmented subtitle file (ttml or tagged text)
     :param ttml: whether file_path is in ttml format
@@ -49,105 +57,194 @@ def get_masses(file_path, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG
     # <eol> only segmentation
     eol_str = re.sub(caption_tag, r" ", file_str)
     eol_masses = [len(segment.split()) for segment in eol_str.split(line_tag)]
-    # <eol> + <eob> segmentation
+    # <eox> (<eol> = <eob>) segmentation
     eox_str = re.sub(caption_tag, line_tag, file_str)
     eox_masses = [len(segment.split()) for segment in eox_str.split(line_tag)]
 
     return eob_masses, eol_masses, eox_masses
 
 
+def masses_to_sets(eob_masses, eol_masses, eox_masses):
+    """
+    Convert segmentation masses to boundary sets for subtitle segmentation.
+
+    :param eob_masses: <eob> segmentation masses (segeval.BoundaryFormat.mass format)
+    :param eol_masses: <eol> segmentation masses
+    :param eox_masses: <eox> segmentation masses
+    :return: boundary sets (segeval.BoundaryFormat.sets format)
+    """
+    eob_sets = segeval.boundary_string_from_masses(eob_masses)
+    eol_sets = segeval.boundary_string_from_masses(eol_masses)
+    eox_sets = segeval.boundary_string_from_masses(eox_masses)
+    eob_eol_sets = tuple(eob_set.union(map(lambda x: 2 * x, eol_set)) for eob_set, eol_set in zip(eob_sets, eol_sets))
+
+    return eob_sets, eol_sets, eox_sets, eob_eol_sets
+
+
 def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_window_size=None, eob_window_size=None,
-             eox_window_size=None, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+             eox_window_size=None, nt=NT, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
 
     sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
                                                              caption_tag=caption_tag)
     ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, ttml=ttml, line_tag=line_tag,
                                                              caption_tag=caption_tag)
+    sys_eob_sets, sys_eol_sets, sys_eox_sets, sys_eob_eol_sets = masses_to_sets(sys_eob_masses, sys_eol_masses,
+                                                                                sys_eox_masses)
+    ref_eob_sets, ref_eol_sets, ref_eox_sets, ref_eob_eol_sets = masses_to_sets(ref_eob_masses, ref_eol_masses,
+                                                                                ref_eox_masses)
 
     results = dict()
 
     print('<eob> only segmentation:')
-    results['<eob> only'] = dict()
+    results[EOB] = dict()
     # Window size is computed only if Pk or WindowDiff is computed
     if PK in metrics or WINDOW_DIFF in metrics:
         if eob_window_size is None:
             eob_window_size = segeval.compute_window_size(ref_eob_masses)
         print('  window_size =', eob_window_size)
-        results['<eob> only']['window_size'] = eob_window_size
+        results[EOB]['window_size'] = eob_window_size
     # Case where Pk is computed
     if PK in metrics:
         eob_pk = segeval.pk(sys_eob_masses, ref_eob_masses, window_size=eob_window_size)
         print('  Pk = %.3f' % eob_pk)
-        results['<eob> only']['pk'] = float(eob_pk)
+        results[EOB][PK] = float(eob_pk)
     # Case where WindowDiff is computed
     if WINDOW_DIFF in metrics:
         eob_window_diff = segeval.window_diff(sys_eob_masses, ref_eob_masses, window_size=eob_window_size)
         print('  WindowDiff = %.3f' % eob_window_diff)
-        results['<eob> only']['window_diff'] = float(eob_window_diff)
+        results[EOB][WINDOW_DIFF] = float(eob_window_diff)
+    # Case where Segmentation Similarity is computed
+    if SEG_SIM in metrics:
+        eob_seg_sim = segeval.segmentation_similarity(sys_eob_sets, ref_eob_sets,
+                                                      boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  S = %.3f' % eob_seg_sim)
+        results[EOB][SEG_SIM] = float(eob_seg_sim)
+    # Case where Boundary Similarity is computed
+    if BOUND_SIM in metrics:
+        eob_bound_sim = segeval.boundary_similarity(sys_eob_sets, ref_eob_sets,
+                                                    boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  B = %.3f' % eob_bound_sim)
+        results[EOB][BOUND_SIM] = float(eob_bound_sim)
 
     print('<eol> only segmentation:')
-    results['<eol> only'] = dict()
+    results[EOL] = dict()
     # Window size is computed only if Pk or WindowDiff is computed
     if PK in metrics or WINDOW_DIFF in metrics:
         if eol_window_size is None:
             eol_window_size = segeval.compute_window_size(ref_eol_masses)
         print('  window_size =', eol_window_size)
-        results['<eol> only']['window_size'] = eol_window_size
+        results[EOL]['window_size'] = eol_window_size
     # Case where Pk is computed
     if PK in metrics:
         eol_pk = segeval.pk(sys_eol_masses, ref_eol_masses, window_size=eol_window_size)
         print('  Pk = %.3f' % eol_pk)
-        results['<eol> only']['pk'] = float(eol_pk)
+        results[EOL][PK] = float(eol_pk)
     # Case where WindowDiff is computed
     if WINDOW_DIFF in metrics:
         eol_window_diff = segeval.window_diff(sys_eol_masses, ref_eol_masses, window_size=eol_window_size)
         print('  WindowDiff = %.3f' % eol_window_diff)
-        results['<eol> only']['window_diff'] = float(eol_window_diff)
+        results[EOL][WINDOW_DIFF] = float(eol_window_diff)
+    # Case where Segmentation Similarity is computed
+    if SEG_SIM in metrics:
+        eol_seg_sim = segeval.segmentation_similarity(sys_eol_sets, ref_eol_sets,
+                                                      boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  S = %.3f' % eol_seg_sim)
+        results[EOL][SEG_SIM] = float(eol_seg_sim)
+    # Case where Boundary Similarity is computed
+    if BOUND_SIM in metrics:
+        eol_bound_sim = segeval.boundary_similarity(sys_eol_sets, ref_eol_sets,
+                                                    boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  B = %.3f' % eol_bound_sim)
+        results[EOL][BOUND_SIM] = float(eol_bound_sim)
 
-    print('<eol> + <eob> segmentation:')
-    results['<eol> + <eob>'] = dict()
+    print('<eox> segmentation:')
+    results[EOX] = dict()
     # Window size is computed only if Pk or WindowDiff is computed
     if PK in metrics or WINDOW_DIFF in metrics:
         if eox_window_size is None:
             eox_window_size = segeval.compute_window_size(ref_eox_masses)
         print('  window_size =', eox_window_size)
-        results['<eol> + <eob>']['window_size'] = eox_window_size
+        results[EOX]['window_size'] = eox_window_size
     # Case where Pk is computed
     if PK in metrics:
         eox_pk = segeval.pk(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
         print('  Pk = %.3f' % eox_pk)
-        results['<eol> + <eob>']['pk'] = float(eox_pk)
+        results[EOX][PK] = float(eox_pk)
     # Case where WindowDiff is computed
     if WINDOW_DIFF in metrics:
         eox_window_diff = segeval.window_diff(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
         print('  WindowDiff = %.3f' % eox_window_diff)
-        results['<eol> + <eob>']['window_diff'] = float(eox_window_diff)
+        results[EOX][WINDOW_DIFF] = float(eox_window_diff)
+    # Case where Segmentation Similarity is computed
+    if SEG_SIM in metrics:
+        eox_seg_sim = segeval.segmentation_similarity(sys_eox_sets, ref_eox_sets,
+                                                      boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  S = %.3f' % eox_seg_sim)
+        results[EOX][SEG_SIM] = float(eox_seg_sim)
+    # Case where Boundary Similarity is computed
+    if BOUND_SIM in metrics:
+        eox_bound_sim = segeval.boundary_similarity(sys_eox_sets, ref_eox_sets,
+                                                    boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  B = %.3f' % eox_bound_sim)
+        results[EOX][BOUND_SIM] = float(eox_bound_sim)
+
+    print('<eob>,<eol> segmentation:')
+    results[EOB_EOL] = dict()
+    # Case where Segmentation Similarity is computed
+    if SEG_SIM in metrics:
+        eob_eol_seg_sim = segeval.segmentation_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
+                                                          boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  S = %.3f' % eob_eol_seg_sim)
+        results[EOB_EOL][SEG_SIM] = float(eob_eol_seg_sim)
+    # Case where Boundary Similarity is computed
+    if BOUND_SIM in metrics:
+        eob_eol_bound_sim = segeval.boundary_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
+                                                        boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+        print('  B = %.3f' % eob_eol_bound_sim)
+        results[EOB_EOL][BOUND_SIM] = float(eob_eol_bound_sim)
 
     return results
 
 
-def get_metrics(sys_file_path, ref_file_path, ttml=False, eol_window_size=None, eob_window_size=None,
-             eox_window_size=None, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def get_metrics(sys_file_path, ref_file_path, ttml=False, eox_window_size=None, nt=NT, line_tag=LINE_TAG,
+                caption_tag=CAPTION_TAG):
 
     sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
                                                                 caption_tag=caption_tag)
     ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, ttml=ttml, line_tag=line_tag,
                                                                 caption_tag=caption_tag)
-    print('<eol> + <eob> segmentation:')
-    # Window size is computed only if Pk or WindowDiff is computed
+    sys_eob_sets, sys_eol_sets, sys_eox_sets, sys_eob_eol_sets = masses_to_sets(sys_eob_masses, sys_eol_masses,
+                                                                                sys_eox_masses)
+    ref_eob_sets, ref_eol_sets, ref_eox_sets, ref_eob_eol_sets = masses_to_sets(ref_eob_masses, ref_eol_masses,
+                                                                                ref_eox_masses)
+
+    print('<eox> segmentation:')
+    # Window size is computed
     if eox_window_size is None:
         eox_window_size = segeval.compute_window_size(ref_eox_masses)
     print('  window_size =', eox_window_size)
-    # Case where Pk is computed
+    # Pk is computed
     eox_pk = segeval.pk(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
     print('  Pk = %.3f' % eox_pk)
     pk = float(eox_pk)
-    # Case where WindowDiff is computed
+    # WindowDiff is computed
     eox_window_diff = segeval.window_diff(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
     print('  WindowDiff = %.3f' % eox_window_diff)
     window_diff = float(eox_window_diff)
 
-    return eox_window_size, pk, window_diff
+    print('<eob>,<eol> segmentation:')
+    # Segmentation Similarity is computed
+    eob_eol_seg_sim = segeval.segmentation_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
+                                                      boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+    print('  S = %.3f' % eob_eol_seg_sim)
+    seg_sim = float(eob_eol_seg_sim)
+    # Boundary Similarity is computed
+    eob_eol_bound_sim = segeval.boundary_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
+                                                    boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
+    print('  B = %.3f' % eob_eol_bound_sim)
+    bound_sim = float(eob_eol_bound_sim)
+
+    return eox_window_size, pk, window_diff, seg_sim, bound_sim
 
 
 ## MAIN  #######################################################################
@@ -177,7 +274,7 @@ def parse_args():
     parser.add_argument('--eol_window_size', '-eolws', type=int,
                         help="window size for the <eol> only segmentation evaluation")
     parser.add_argument('--eox_window_size', '-eoxws', type=int,
-                        help="window size for the <eol> + <eob> segmentation evaluation")
+                        help="window size for the <eox> (<eol> = <eob>) segmentation evaluation")
 
     args = parser.parse_args()
     return args
