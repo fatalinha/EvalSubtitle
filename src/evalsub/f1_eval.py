@@ -1,6 +1,5 @@
 # coding: utf-8
-from ttml import ttml_to_tagged_str
-import re
+
 import argparse
 
 DESCRIPTION = """Script for computing precision/recall/F1 

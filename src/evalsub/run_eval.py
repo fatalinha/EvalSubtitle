@@ -2,7 +2,7 @@
 import os.path
 import pandas as pd
 import sys
-from eval_segmentation import get_metrics
+from seg_eval import get_metrics
 from f1_eval import evaluate_f1
 from length_conformity import len_process
 from ter_eval import ter_process

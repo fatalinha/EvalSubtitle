@@ -1,7 +1,7 @@
 # coding: utf-8
 
 DESCRIPTION = """
-Script to compute the segmentation metrics for a pair of segmented subtitle files.
+Script to compute the standard segmentation metrics for a pair of segmented subtitle files.
 """
 
 import argparse
@@ -10,13 +10,15 @@ import re
 
 import segeval
 
-from ttml import ttml_to_tagged_str
+from util.ttml import ttml_to_tagged_str
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 PK = "pk"
 WINDOW_DIFF = "window_diff"
-METRICS = frozenset({PK, WINDOW_DIFF})
+SEG_SIM = "segmentation_similarity"
+BOUND_SIM = "boundary_similarity"
+METRICS = frozenset({PK, WINDOW_DIFF, SEG_SIM, BOUND_SIM})
 
 def get_masses(file_path, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
     """

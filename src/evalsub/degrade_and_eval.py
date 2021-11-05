@@ -3,7 +3,7 @@ import sys
 import os
 from os.path import join, exists
 from run_eval import run_evaluation
-from degrade_tagged_txt import *
+from util.degrade_tagged_txt import shift, add, delete, replace
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
