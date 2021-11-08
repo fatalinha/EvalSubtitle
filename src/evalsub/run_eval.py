@@ -13,7 +13,7 @@ LINE_TAG = '<eol>'
 
 
 def run_evaluation(reference_file, sys_file, metrics):
-    window, pk, windiff = get_metrics(sys_file, reference_file)
+    window, pk, windiff, seg_sim, bound_sim = get_metrics(sys_file, reference_file)
     len_conf = len_process(sys_file, 42)
     bleu = bleu_process(reference_file, sys_file)
     ter_br = ter_process(reference_file, sys_file)
@@ -31,6 +31,8 @@ def run_evaluation(reference_file, sys_file, metrics):
     metrics['TER_br'].append(ter_br)
     #metrics['TER_br'].append(0)
     metrics['Len'].append(len_conf)
+    metrics['SegSim'].append(seg_sim)
+    metrics['BoundSim'].append(bound_sim)
     return metrics
 
 

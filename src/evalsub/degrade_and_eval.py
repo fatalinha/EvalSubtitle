@@ -15,7 +15,7 @@ outfile = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/03_results/results.c
 # Init dictionary to store metrics
 eval_metrics = dict(System=[], Mode=[], NU=[], P=[], Change=[],
                     Win=[], Pk=[], WinDiff=[], Precision=[], Recall=[], F1=[],
-                    BLEU=[], TER_br=[], Len=[])
+                    BLEU=[], TER_br=[], Len=[], SegSim=[], BoundSim=[])
 
 # start degrading
 print('Start degrading files.')
