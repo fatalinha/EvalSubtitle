@@ -14,6 +14,9 @@ try:
 except ImportError:
     FRE = False
 
+from util import write_lines
+
+
 COLOR_FILTER = frozenset(['magenta', 'red'])
 MAX_CPL = 36
 MAX_CPS = 15
@@ -89,16 +92,6 @@ def hmsf_to_s(hmsf):
     s += 3600*h + 60*m + 0.04*f
     
     return s
-
-
-def write_lines(lines, file_path, add=False):
-    mode = 'a' if add else 'w'
-    file = open(file_path, mode)
-    
-    for line in lines:
-        file.write(line + '\n')
-    
-    file.close()
 
 
 def find_eos_positions(s):
@@ -484,7 +477,8 @@ def ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path,
 
     print('Writing...')
     write_lines(sub_segments, tagged_txt_file_path)
-    write_lines(time_spans, timecode_file_path)
+    if timecode_file_path is not None:
+        write_lines(time_spans, timecode_file_path)
 
 
 def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
@@ -533,7 +527,7 @@ def main(args):
     
     ttml_file_path = args.ttml_file
     text_file_path = args.text_file
-    tagged_txt_file_path = args.tagged_txt_marked_file
+    tagged_txt_file_path = args.tagged_txt_file
     timecode_file_path = args.timecode_file
     
     filtering = args.filtering
