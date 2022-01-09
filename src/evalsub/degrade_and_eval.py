@@ -22,6 +22,8 @@ def parse_args():
     parser.add_argument('--reference_file', '-ref', type=str, default=REF_FILE_PATH)
     parser.add_argument('--results_file', '-res', type=str, default=RES_FILE_PATH)
     parser.add_argument('--no_ter', '-nter', action='store_true')
+    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_spaces',
+                        help="wether proportions are relative to the number of boundaries, or to the number of free slots")
 
     args = parser.parse_args()
     return args
@@ -32,6 +34,7 @@ def main(args):
     ref_file_path = args.reference_file
     res_file_path = args.results_file
     no_ter = args.no_ter
+    wrt_n_boundaries = args.with_respect_to == 'n_bound'
 
 
     # Init dictionary to store metrics
@@ -78,8 +81,10 @@ def main(args):
 
                 if mode == 'add':
                     eval_metrics['NU'].append(0)
+                    if not wrt_n_boundaries:
+                        prob_eo /= 2
                     stats = add(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=LINE_TAG,
-                                  caption_tag=CAPTION_TAG)
+                                  caption_tag=CAPTION_TAG, wrt_n_boundaries=wrt_n_boundaries)
                 elif mode == 'delete':
                     eval_metrics['NU'].append(0)
                     stats = delete(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=LINE_TAG,

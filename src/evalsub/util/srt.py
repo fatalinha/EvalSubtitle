@@ -3,7 +3,7 @@
 import argparse
 import re
 
-from util import write_lines
+from .util import write_lines
 
 
 LINE_TAG = '<eol>'

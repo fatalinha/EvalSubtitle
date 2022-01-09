@@ -14,7 +14,7 @@ try:
 except ImportError:
     FRE = False
 
-from util import write_lines
+from .util import write_lines
 
 
 COLOR_FILTER = frozenset(['magenta', 'red'])
