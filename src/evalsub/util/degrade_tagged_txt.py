@@ -205,6 +205,7 @@ def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, c
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+
     stats = [n_eol, n_eob, n_eol_deletions, n_eob_deletions]
     return stats
 
@@ -245,6 +246,7 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+
     stats = [n_eol, n_eob, n_eol_replacements, n_eob_replacements]
     return stats
 

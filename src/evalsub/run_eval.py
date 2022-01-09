@@ -12,11 +12,11 @@ CAPTION_TAG = '<eob>'
 LINE_TAG = '<eol>'
 
 
-def run_evaluation(reference_file, sys_file, metrics):
+def run_evaluation(reference_file, sys_file, metrics, no_ter=False):
     window, pk, windiff, seg_sim, bound_sim = get_metrics(sys_file, reference_file)
     len_conf = len_process(sys_file, 42)
     bleu = bleu_process(reference_file, sys_file)
-    ter_br = ter_process(reference_file, sys_file)
+    ter_br = -1 if no_ter else ter_process(reference_file, sys_file)
     precision, recall, f1 = evaluate_f1(reference_file, sys_file, '<eox>', ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
 
     # collect metrics to dictionary
@@ -33,7 +33,6 @@ def run_evaluation(reference_file, sys_file, metrics):
     metrics['Len'].append(len_conf)
     metrics['SegSim'].append(seg_sim)
     metrics['BoundSim'].append(bound_sim)
-    return metrics
 
 
 def write_csv(outfile, metric_dic):
