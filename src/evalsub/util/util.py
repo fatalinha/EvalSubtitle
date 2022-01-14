@@ -14,12 +14,16 @@ def preprocess(input_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line
                caption_holder=CAPTION_HOLDER):
     r"""
     Preprocess the text from a tagged txt file.
-    Boundaries are replaced by 1-char placeholders.
+
+    Removing potential multiple spaces.
+    Removing potential spaces in the beginning of file lines.
+    Removing spaces besides boundaries.
+    Replacing boundaries with 1-char placeholders.
 
     Exple:
-    
-    INPUT - "The cat <eol> is black. <eob>\\nHe's sleeping <eob>\\n"
-    OUTPUT - "The catµis black.§\\nHe's sleeping§\\n"
+
+    INPUT - "The cat <eol> is black. <eob>\\nHe's sleeping. <eob>\\n"
+    OUTPUT - "The catµis black.§\\nHe's sleeping.§\\n"
 
     :param input_file_path: tagged txt file
     :param line_tag: end-of-line tag
