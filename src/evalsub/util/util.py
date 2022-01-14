@@ -10,6 +10,21 @@ LINE_HOLDER = 'µ'
 CAPTION_HOLDER = '§'
 
 
+def postprocess(tagged_txt, output_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line_holder=LINE_HOLDER,
+                caption_holder=CAPTION_HOLDER):
+    # Replacing 1-char placeholders with boundaries
+    tagged_txt = re.sub(line_holder, line_tag, tagged_txt)
+    tagged_txt = re.sub(caption_holder, caption_tag, tagged_txt)
+    # Inserting spaces besides boundaries
+    tagged_txt = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", tagged_txt)
+    # Removing potential multiple spaces
+    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    # Segmenting in file lines
+    tagged_txt = [line.strip() for line in tagged_txt.splitlines()]
+    # Writing
+    write_lines(tagged_txt, output_file_path)
+
+
 def preprocess(input_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line_holder=LINE_HOLDER,
                caption_holder=CAPTION_HOLDER):
     r"""
@@ -44,6 +59,14 @@ def preprocess(input_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line
     tagged_txt = re.sub(caption_tag, caption_holder, tagged_txt)
 
     return tagged_txt
+
+
+def replace_char(string, pos, c):
+    return string[:pos] + c + string[pos + 1:]
+
+
+def replace_substring(string, start, end, substring):
+    return string[:start] + substring + string[end:]
 
 
 def write_lines(lines, file_path, newline=True, add=False, make_dir=True, convert=False):

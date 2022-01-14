@@ -10,29 +10,13 @@ import argparse
 import random
 import re
 
-from .util import write_lines, preprocess
+from .util import postprocess, preprocess, replace_char, write_lines
 
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 LINE_HOLDER = 'µ'
 CAPTION_HOLDER = '§'
-
-
-def postprocess(tagged_txt, output_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
-    # Replacing 1-char placeholders with boundaries
-    tagged_txt = re.sub(LINE_HOLDER, line_tag, tagged_txt)
-    tagged_txt = re.sub(CAPTION_HOLDER, caption_tag, tagged_txt)
-    # Inserting spaces besides boundaries
-    tagged_txt = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", tagged_txt)
-    # Segmenting in file lines
-    tagged_txt = [line.strip() for line in tagged_txt.splitlines()]
-    # Writing
-    write_lines(tagged_txt, output_file_path)
-
-
-def replace_char(string, pos, c):
-    return string[:pos] + c + string[pos + 1:]
 
 ## SHIFT  ######################################################################
 
@@ -230,6 +214,72 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
     stats = [n_eol, n_eob, n_eol_replacements, n_eob_replacements]
     return stats
 
+## MIXED  ######################################################################
+
+def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_eob_del,
+          p_eol_rep, p_eob_rep, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+    print('Initializing...')
+    tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
+
+    eol_positions = set([m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)])
+    eob_positions = set([m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)])
+    space_positions = [m.start() for m in re.finditer(r" ", tagged_txt)]
+
+    n_eol = len(eol_positions)
+    n_eob = len(eob_positions)
+    n_spaces = len(space_positions)
+
+    # n_eol_shifts = round(p_eol_shift * n_eol)
+    # n_eob_shifts = round(p_eob_shift * n_eob)
+    n_eol_additions = round(p_eol_add * n_eol)
+    n_eob_additions = round(p_eob_add * n_eob)
+    n_eol_deletions = round(p_eol_del * n_eol)
+    n_eob_deletions = round(p_eob_del * n_eob)
+    n_eol_replacements = round(p_eol_rep * n_eol)
+    n_eob_replacements = round(p_eob_rep * n_eob)
+
+    # Sampling the boundaries to shift
+    # eol_to_shift = random.sample(eol_positions, n_eol_shifts)
+    # eob_to_shift = random.sample(eob_positions, n_eob_shifts)
+    # eol_positions.difference_update(eol_to_shift)
+    # eob_positions.difference_update(eob_to_shift)
+
+    # Sampling the boundaries to delete
+    eol_to_delete = random.sample(eol_positions, n_eol_deletions)
+    eob_to_delete = random.sample(eob_positions, n_eob_deletions)
+    eol_positions.difference_update(eol_to_delete)
+    eob_positions.difference_update(eob_to_delete)
+
+    # Sampling the boundaries to replace
+    eol_to_replace = random.sample(eol_positions, n_eol_replacements)
+    eob_to_replace = random.sample(eob_positions, n_eob_replacements)
+
+    # Sampling the boundaries to add
+    boundaries_to_add = random.sample(space_positions, n_eol_additions + n_eob_additions)
+    eol_to_add = random.sample(boundaries_to_add, n_eol_additions)
+    eob_to_add = set(boundaries_to_add)
+    eob_to_add.difference_update(eol_to_add)
+
+    # Deleting boundaries
+    boundaries_to_delete = eol_to_delete + eob_to_delete
+    for boundary_pos in boundaries_to_delete:
+        tagged_txt = replace_char(tagged_txt, boundary_pos, ' ')
+
+    # Replacing boundaries
+    for eol_pos in eol_to_replace:
+        tagged_txt = replace_char(tagged_txt, eol_pos, CAPTION_HOLDER)
+    for eob_pos in eob_to_replace:
+        tagged_txt = replace_char(tagged_txt, eob_pos, LINE_HOLDER)
+
+    # Adding boundaries
+    for eol_pos in eol_to_add:
+        tagged_txt = replace_char(tagged_txt, eol_pos, LINE_HOLDER)
+    for eob_pos in eob_to_add:
+        tagged_txt = replace_char(tagged_txt, eob_pos, CAPTION_HOLDER)
+
+    print('Writing...')
+    postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+
 ## MAIN  #######################################################################
 
 def parse_args():
@@ -248,7 +298,7 @@ def parse_args():
                         help="percentage of eol boundaries to be affected")
     parser.add_argument('--percentage_eob', '-peob', type=float, default=0.0,
                         help="percentage of eob boundaries to be affected")
-    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_spaces',
+    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_bound',
                         help="wether proportions are relative to the number of boundaries, or to the number of free slots")
 
     args = parser.parse_args()
