@@ -10,33 +10,13 @@ import argparse
 import random
 import re
 
+from .util import write_lines, preprocess
+
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 LINE_HOLDER = 'µ'
 CAPTION_HOLDER = '§'
-
-
-def write_lines(lines, file_path):
-    file = open(file_path, 'w')
-    for line in lines:
-        file.write(line + '\n')
-    file.close()
-
-
-def preprocess(input_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
-    tagged_txt = open(input_file_path).read()
-    # Removing potential multiple spaces
-    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
-    # Removing potential spaces in the beginning of file lines
-    tagged_txt = re.sub(r"\n ", r"\n", tagged_txt)
-    # Removing spaces besides boundaries
-    tagged_txt = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_txt)
-    # Replacing boundaries with 1-char placeholders
-    tagged_txt = re.sub(line_tag, LINE_HOLDER, tagged_txt)
-    tagged_txt = re.sub(caption_tag, CAPTION_HOLDER, tagged_txt)
-
-    return tagged_txt
 
 
 def postprocess(tagged_txt, output_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
