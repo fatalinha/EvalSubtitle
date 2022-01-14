@@ -43,46 +43,49 @@ def bleu_preprocess(infile, remove_eol=False, remove_eob=False, replace=False):
 def calculate_bleu(sys, ref):
     ref1 = [ref]
     bleu = BLEU()
-    score = bleu.corpus_score(sys, ref1)
+    bleu_score = bleu.corpus_score(sys, ref1)
     signature = bleu.get_signature()
-    return score, signature
+    return bleu_score, signature
 
 
-def bleu_process(reference_file, system_file):
+def bleu_process(reference_file, system_file, extra=False):
+    bleu = BLEU()
 
     ref = bleu_preprocess(reference_file)
     sys = bleu_preprocess(system_file)
 
-    score, signature = calculate_bleu(sys, ref)
+    bleu_score = bleu.corpus_score(sys, [ref])
+    signature = bleu.get_signature()
 
-    # remove breaks
-    ref_nb = bleu_preprocess(reference_file, remove_eol=True, remove_eob=True)
-    sys_nb = bleu_preprocess(system_file, remove_eol=True, remove_eob=True)
-    score_nobreak, _ = calculate_bleu(sys_nb, ref_nb)
+    if extra:
+        # remove breaks
+        ref_nb = bleu_preprocess(reference_file, remove_eol=True, remove_eob=True)
+        sys_nb = bleu_preprocess(system_file, remove_eol=True, remove_eob=True)
+        score_nobreak = bleu.corpus_score(sys_nb, [ref_nb])
 
-    bleu_diff = score_nobreak.score - score.score
+        bleu_diff = score_nobreak.score - bleu_score.score
 
-    # remove blocks
-    ref_nb = bleu_preprocess(reference_file, remove_eob=True)
-    sys_nb = bleu_preprocess(system_file, remove_eob=True)
-    score_eol, _ = calculate_bleu(sys_nb, ref_nb)
+        # remove blocks
+        ref_nb = bleu_preprocess(reference_file, remove_eob=True)
+        sys_nb = bleu_preprocess(system_file, remove_eob=True)
+        score_eol = bleu.corpus_score(sys_nb, [ref_nb])
 
-    # remove lines
-    ref_nb = bleu_preprocess(reference_file, remove_eol=True)
-    sys_nb = bleu_preprocess(system_file, remove_eol=True)
-    score_eob, _ = calculate_bleu(sys_nb, ref_nb)
+        # remove lines
+        ref_nb = bleu_preprocess(reference_file, remove_eol=True)
+        sys_nb = bleu_preprocess(system_file, remove_eol=True)
+        score_eob = bleu.corpus_score(sys_nb, [ref_nb])
 
-    # replace with the same break
-    ref_nb = bleu_preprocess(reference_file, replace=True)
-    sys_nb = bleu_preprocess(system_file, replace=True)
-    score_same, _ = calculate_bleu(sys_nb, ref_nb)
+        # replace with the same break
+        ref_nb = bleu_preprocess(reference_file, replace=True)
+        sys_nb = bleu_preprocess(system_file, replace=True)
+        score_same = bleu.corpus_score(sys_nb, [ref_nb])
 
-    print('BLEU with breaks:', score)
-    print('BLEU regardless of type of break:', score_same)
-    print('BLEU without breaks:', score_nobreak)
-    print('BLEU only eol:', score_eol)
-    print('BLEU only eob:', score_eob)
-    print('BLEU difference without-with:', bleu_diff)
+        print('BLEU with breaks:', bleu_score)
+        print('BLEU regardless of type of break:', score_same)
+        print('BLEU without breaks:', score_nobreak)
+        print('BLEU only eol:', score_eol)
+        print('BLEU only eob:', score_eob)
+        print('BLEU difference without-with:', bleu_diff)
+
     print(signature)
-    bleu_only = score.score
-    return bleu_only
+    return bleu_score.score
