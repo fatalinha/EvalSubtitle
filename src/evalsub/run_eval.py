@@ -1,12 +1,13 @@
 # coding: utf-8
+
 import os.path
 import pandas as pd
-import sys
-from seg_eval import get_metrics
-from f1_eval import evaluate_f1
-from length_conformity import len_process
-from ter_eval import ter_process
-from bleu_eval import bleu_process
+
+from eval.seg_eval import get_metrics
+from eval.f1_eval import evaluate_f1
+from eval.length_conformity import len_process
+from eval.ter_eval import ter_process
+from eval.bleu_eval import bleu_process
 
 CAPTION_TAG = '<eob>'
 LINE_TAG = '<eol>'
@@ -29,7 +30,6 @@ def run_evaluation(reference_file, sys_file, metrics, no_ter=False):
     metrics['F1'].append(f1)
     metrics['BLEU'].append(bleu)
     metrics['TER_br'].append(ter_br)
-    #metrics['TER_br'].append(0)
     metrics['Len'].append(len_conf)
     metrics['SegSim'].append(seg_sim)
     metrics['BoundSim'].append(bound_sim)
