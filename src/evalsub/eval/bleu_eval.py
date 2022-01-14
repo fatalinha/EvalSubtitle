@@ -8,7 +8,7 @@ import re
 
 from sacrebleu.metrics import BLEU
 
-from util.util import preprocess
+from evalsub.util.util import preprocess
 
 #reference_file = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'#sys.argv[1]
 #system_file = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/02_contrastive_pairs/seq2seqSegmenter/generate-amara_en' #sys.argv[2]
@@ -48,11 +48,11 @@ def calculate_bleu(sys, ref):
     return bleu_score, signature
 
 
-def bleu_process(reference_file, system_file, extra=False):
+def bleu_process(reference_file, system_file, extra=False, no_break=False):
     bleu = BLEU()
 
-    ref = bleu_preprocess(reference_file)
-    sys = bleu_preprocess(system_file)
+    ref = bleu_preprocess(reference_file, remove_eol=no_break, remove_eob=no_break)
+    sys = bleu_preprocess(system_file, remove_eol=no_break, remove_eob=no_break)
 
     bleu_score = bleu.corpus_score(sys, [ref])
     signature = bleu.get_signature()
@@ -88,4 +88,4 @@ def bleu_process(reference_file, system_file, extra=False):
         print('BLEU difference without-with:', bleu_diff)
 
     print(signature)
-    return bleu_score.score
+    return bleu_score

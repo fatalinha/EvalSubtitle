@@ -280,6 +280,18 @@ def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
+    n_eol += n_eol_additions
+    n_eol -= n_eol_deletions
+    n_eol += n_eob_replacements
+    n_eol -= n_eol_replacements
+
+    n_eob += n_eob_additions
+    n_eob -= n_eob_deletions
+    n_eob += n_eol_replacements
+    n_eob -= n_eob_replacements
+
+    return n_eol, n_eob
+
 ## MAIN  #######################################################################
 
 def parse_args():

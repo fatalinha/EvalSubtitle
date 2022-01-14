@@ -55,3 +55,7 @@ def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=LINE_
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
+
+    n_words += n_word_additions
+    n_words -= n_word_deletions
+    return n_words

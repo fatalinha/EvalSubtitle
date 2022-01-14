@@ -16,8 +16,8 @@ LINE_TAG = '<eol>'
 def run_evaluation(reference_file, sys_file, metrics, no_ter=False):
     window, pk, windiff, seg_sim, bound_sim = get_metrics(sys_file, reference_file)
     len_conf = len_process(sys_file, 42)
-    bleu = bleu_process(reference_file, sys_file)
-    ter_br = -1 if no_ter else ter_process(reference_file, sys_file)
+    bleu = bleu_process(reference_file, sys_file).score
+    ter_br = -1 if no_ter else ter_process(reference_file, sys_file).score
     precision, recall, f1 = evaluate_f1(reference_file, sys_file, '<eox>', ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
 
     # collect metrics to dictionary

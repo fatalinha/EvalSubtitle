@@ -8,7 +8,7 @@ import re
 
 from sacrebleu.metrics import TER
 
-from util.util import preprocess
+from evalsub.util.util import preprocess
 
 
 MASK_CHAR = '#'
@@ -62,5 +62,5 @@ def ter_process(reference_file, system_file, extra=False):
         print('TER score on masked text:', ter_score)
 
     print(signature)
-    return ter_score.score
+    return ter_score
 

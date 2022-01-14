@@ -10,7 +10,7 @@ import re
 
 import segeval
 
-from util.ttml import ttml_to_tagged_str
+from evalsub.util.ttml import ttml_to_tagged_str
 
 
 LINE_TAG = '<eol>'
