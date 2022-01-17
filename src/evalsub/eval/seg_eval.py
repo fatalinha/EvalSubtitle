@@ -6,9 +6,16 @@ Script to compute the standard segmentation metrics for a pair of segmented subt
 
 import argparse
 import json
+import os
 import re
+import sys
 
 import segeval
+
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
 from evalsub.util.ttml import ttml_to_tagged_str
 

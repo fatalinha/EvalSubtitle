@@ -51,7 +51,7 @@ def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=LINE_
         tagged_txt = replace_char(tagged_txt, word_pos, MASK_CHAR)
 
     # Inserting spaces besides masked chars
-    tagged_txt = re.sub(MASK_CHAR, r" \1 ", tagged_txt)
+    tagged_txt = re.sub(MASK_CHAR, r" %s " % MASK_CHAR, tagged_txt)
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)

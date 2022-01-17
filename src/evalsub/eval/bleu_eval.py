@@ -4,9 +4,16 @@ DESCRIPTION = """
 Computes BLEU and the difference between BLEU with and without breaks
 """
 
+import os
 import re
+import sys
 
 from sacrebleu.metrics import BLEU
+
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
 from evalsub.util.util import preprocess
 
