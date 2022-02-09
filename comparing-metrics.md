@@ -10,8 +10,7 @@
 | BLEU(-br)               | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:    | [SacreBLEU](https://github.com/mjpost/sacrebleu)? | 
 | TER-br                  | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:    | [TER](https://www.cs.umd.edu/~snover/tercom/)        |
 | S-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | [SacreBLEU](https://github.com/mjpost/sacrebleu) | 
-| T-BLEU | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark: | | 
-| TBHR | :heavy_check_mark:(n) | :heavy_check_mark: | ???                | :heavy_check_mark:  | | 
+
 
 ### Pk
 
@@ -68,52 +67,6 @@ TER calculated with all tokens of the sentence masked.
 
 Subtitle BLEU. Calculates BLEU on subtitles instead of sentences, so that any target words that appear in the wrong subtitle count as error. Assumes that the subtitles in the target and the reference match.
 
-### Timed BLEU (T-BLEU)
-
-[Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
-
-Target-reference segment pairs are created by linear temporal alignment, over which BLEU is calculated normally.
-
-### T-BLEU Headroom (TBHR)
-[Cherry21markup](https://www.isca-speech.org/archive/pdfs/interspeech_2021/cherry21_interspeech.pdf)
-
-Difference between upper bound of T-BLEU and actual T-BLEU. The upper bound is calculated as follows: The system’s predicted subtitle boundaries are ignored, and instead the unsegmented translation is aligned with the reference subtitles by minimizing WER. This gives subtitle boundaries that approximately maximize T-BLEU. This is a lower-is-better boundary error rate, interpretable as the amount of T-BLEU that could be recovered by improving only the position of the boundaries.
-
-# Comparing metrics on contrastive pairs
-
-Questions:
-- What is the response of BLEU-br, TER-br, when gradually degrading reference segmentations?
-- How do they compare to standard segmentation metrics in that regard?
-- Could BLEU-br be normalized for segmentation?
-- How to integrate boundary hierarchy in F1, Pk, WD?
-
-### Contrastive pairs
-
-Possible rules to use for crafting an error example from a reference:
-- shift a boundary of *n* words on the right or left
-- insert new boundaries into free slots, and/or remove existing boundaries
-- change the type of a boundary (end-of-line/end-of-block)
-
-Length-based segmentation (before max. number of characters is reached).
-
-Sequence-to-Sequence segmenter
-
-# Evaluating without references
-
-Segmentation at the highest node
-
-Chink-Chunk (POS-tags)
-
-Language model scoring (POS-based)
-
 # Adapting standard metrics via alignment
 
-Monotonic alignment of subtitles
-
 MWER (Matusov et al., 2006)
-
-# Probing approaches
-
-### Forced decoding
-
-To circumvent the difficulty of evaluating segmentation when the hypothesis sequence differs from the reference sequence, one could force the system to only insert boundaries in a given sequence during decoding.
