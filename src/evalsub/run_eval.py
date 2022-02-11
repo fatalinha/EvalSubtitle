@@ -25,7 +25,7 @@ def run_evaluation(reference_file, sys_file, metrics, no_ter=False):
     metrics['Win'].append(window)
     metrics['Pk'].append(round(pk, 3))
     metrics['WinDiff'].append(round(windiff, 3))
-    metrics['Precision'].append(precision) #TODO: max val of pre,rec= 0.998
+    metrics['Precision'].append(precision)
     metrics['Recall'].append(recall)
     metrics['F1'].append(f1)
     metrics['BLEU'].append(bleu)
