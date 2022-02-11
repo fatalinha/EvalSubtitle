@@ -6,16 +6,15 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src.evalsub.eval.bleu_eval import bleu_process
-from src.evalsub.util.degrade_tagged_txt import mixed as mixed_tags
-from src.evalsub.util.degrade_txt import mixed as mixed_txt
+from evalsub.eval.bleu_eval import bleu_process
+from evalsub.util.degrade_tagged_txt import mixed as mixed_tags
+from evalsub.util.degrade_txt import mixed as mixed_txt
 
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 OUT_DIR_PATH = 'mixed'
 REF_FILE_PATH = '../data/amara.en'
-RES_FILE_PATH = 'results.csv'
 
 
 def parse_args():
@@ -25,7 +24,7 @@ def parse_args():
                         help="Path to save the degraded files")
     parser.add_argument('--reference_file', '-ref', type=str, default=REF_FILE_PATH,
                         help="The reference file against which to compute BLEU")
-    parser.add_argument('--results_file', '-res', type=str, default=RES_FILE_PATH,
+    parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")
 
     args = parser.parse_args()

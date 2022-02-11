@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 Computes TER_br with and without replacement of type of breaks
 """

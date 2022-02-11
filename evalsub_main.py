@@ -3,11 +3,11 @@
 import os.path
 import pandas as pd
 
-from src.evalsub.eval.seg_eval import get_metrics
-from src.evalsub.eval.f1_eval import evaluate_f1
-from src.evalsub.eval.length_conformity import len_process
-from src.evalsub.eval.ter_eval import ter_process
-from src.evalsub.eval.bleu_eval import bleu_process
+from evalsub.eval.seg_eval import get_metrics
+from evalsub.eval.f1_eval import evaluate_f1
+from evalsub.eval.length_conformity import len_process
+from evalsub.eval.ter_eval import ter_process
+from evalsub.eval.bleu_eval import bleu_process
 
 CAPTION_TAG = '<eob>'
 LINE_TAG = '<eol>'

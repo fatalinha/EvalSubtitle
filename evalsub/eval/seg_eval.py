@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 Script to compute the standard segmentation metrics for a pair of segmented subtitle files.
 """

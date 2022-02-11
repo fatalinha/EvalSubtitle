@@ -5,13 +5,13 @@ import os
 import pandas as pd
 
 from evalsub_main import run_evaluation
-from src.evalsub.util.degrade_tagged_txt import shift, add, delete, replace
+from evalsub.util.degrade_tagged_txt import shift, add, delete, replace
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 OUT_DIR_PATH = '.'
 REF_FILE_PATH = '../data/amara.en'
-RES_FILE_PATH = '/results.csv'
+
 
 
 def parse_args():
@@ -21,7 +21,7 @@ def parse_args():
                         help="Path to save the degraded files")
     parser.add_argument('--reference_file', '-ref', type=str, default=REF_FILE_PATH,
                         help="The file to be degraded")
-    parser.add_argument('--results_file', '-res', type=str, default=RES_FILE_PATH,
+    parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")
     parser.add_argument('--no_ter', '-nter', action='store_true',
                         help="Skip the computation of TER_br")

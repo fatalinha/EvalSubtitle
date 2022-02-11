@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 Computes BLEU and the difference between BLEU with and without breaks
 """
@@ -17,8 +16,6 @@ if toplevel_path not in sys.path:
 
 from evalsub.util.util import preprocess
 
-#reference_file = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'#sys.argv[1]
-#system_file = '/home/alin/Desktop/subtitling/03_scripts/EvalSub/02_contrastive_pairs/seq2seqSegmenter/generate-amara_en' #sys.argv[2]
 
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
