@@ -25,7 +25,7 @@ def parse_args():
                         help="csv file to write the metric scores")
     parser.add_argument('--no_ter', '-nter', action='store_true',
                         help="Skip the computation of TER_br")
-    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_spaces',
+    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_bound',
                         help="whether proportions are relative to the number of boundaries or to the number of free slots (spaces)")
 
     args = parser.parse_args()
