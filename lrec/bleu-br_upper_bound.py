@@ -3,8 +3,15 @@
 import argparse
 from math import exp, log
 import os
-import pandas as pd
+import sys
+
 import matplotlib.pyplot as plt
+import pandas as pd
+
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
 from evalsub.eval.bleu_eval import bleu_process
 from evalsub.util.degrade_tagged_txt import mixed as mixed_tags
@@ -14,7 +21,7 @@ from evalsub.util.degrade_txt import mixed as mixed_txt
 LINE_TAG = '<eol>'
 CAPTION_TAG = '<eob>'
 OUT_DIR_PATH = 'mixed'
-REF_FILE_PATH = '../data/amara.en'
+REF_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'amara.en')
 
 
 def parse_args():
