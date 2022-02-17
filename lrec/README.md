@@ -7,15 +7,26 @@ This directory contains the scripts to replicate the experiments presented in th
 python degrade_and_eval.py --output_dir . --reference_file ../data/amara.en --results_file [yourfile.csv]
 ```
 
-## BLEU_br and BLEU_nb: content vs segmentation
+## Experiment 2: BLEU_br and BLEU_nb: content vs segmentation
 ```
 python bleu-br_upper_bound.py --output_dir . --reference_file ../data/amara.en --results_file results.csv
 ```
-## Boundary projection
-Get necessary MWER Segmenter
+
+## Experiment 3: Boundary projection
+First get the required MWER Segmenter
 ```wget https://github.com/PeganovAnton/mwerSegmenter/blob/main/mwerSegmenter```
 
-Run boundary projection
+Run the boundary projection method
 ```
 bash bound_proj.sh $(dirname $0)/../data/nmt.fr $(dirname $0)/../amara.fr nmt fr
 ```
+
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
