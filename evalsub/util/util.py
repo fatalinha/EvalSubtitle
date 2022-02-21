@@ -2,16 +2,18 @@
 
 import os
 import re
+import sys
+
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
+
+import evalsub.util.constants as cst
 
 
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
-LINE_HOLDER = 'µ'
-CAPTION_HOLDER = '§'
-
-
-def postprocess(tagged_txt, output_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line_holder=LINE_HOLDER,
-                caption_holder=CAPTION_HOLDER):
+def postprocess(tagged_txt, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+                caption_holder=cst.CAPTION_HOLDER):
     # Replacing 1-char placeholders with boundaries
     tagged_txt = re.sub(line_holder, line_tag, tagged_txt)
     tagged_txt = re.sub(caption_holder, caption_tag, tagged_txt)
@@ -25,8 +27,8 @@ def postprocess(tagged_txt, output_file_path, line_tag=LINE_TAG, caption_tag=CAP
     write_lines(tagged_txt, output_file_path)
 
 
-def preprocess(input_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line_holder=LINE_HOLDER,
-               caption_holder=CAPTION_HOLDER):
+def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+               caption_holder=cst.CAPTION_HOLDER):
     r"""
     Preprocess the text from a tagged txt file.
 

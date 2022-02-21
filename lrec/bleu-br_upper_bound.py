@@ -14,14 +14,12 @@ if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 from evalsub.eval.bleu_eval import bleu_process
+import evalsub.util.constants as cst
 from evalsub.util.degrade_tagged_txt import mixed as mixed_tags
 from evalsub.util.degrade_txt import mixed as mixed_txt
 
 
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
 OUT_DIR_PATH = 'mixed'
-REF_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'amara.en')
 
 
 def parse_args():
@@ -29,7 +27,7 @@ def parse_args():
 
     parser.add_argument('--output_dir', '-od', type=str, default=OUT_DIR_PATH,
                         help="Path to save the degraded files")
-    parser.add_argument('--reference_file', '-ref', type=str, default=REF_FILE_PATH,
+    parser.add_argument('--reference_file', '-ref', type=str, default=cst.REF_FILE_PATH,
                         help="The reference file against which to compute BLEU")
     parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")

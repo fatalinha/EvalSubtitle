@@ -1,13 +1,19 @@
 # coding: utf-8
+DESCRIPTION = """
+Script for computing precision/recall/F1 for the quality evaluation of subtitle segmentations 
+based on Alvarez et al. 2016.
+"""
 
 import argparse
+import os
+import sys
 
-DESCRIPTION = """Script for computing precision/recall/F1 
- for the quality evaluation of subtitle segmentations
- based on Alvarez et al. 2016."""
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
+import evalsub.util.constants as cst
 
 
 def get_vectors(line, symbol):
@@ -19,7 +25,7 @@ def get_vectors(line, symbol):
     return vector
 
 
-def evaluate_f1(reference_file, system_file, symbol, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def evaluate_f1(reference_file, system_file, symbol, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     # Evaluate Precision, Recall and F1
     breaks_ref = 0  # Number of total breaks in reference (used for precision)
     breaks_out = 0  # Number of total breaks in output (used for recall)
@@ -30,10 +36,10 @@ def evaluate_f1(reference_file, system_file, symbol, ttml=False, line_tag=LINE_T
             if symbol == '<eox>':
                 lref = ' '.join([br.replace(line_tag, symbol).replace(caption_tag, symbol) for br in lref.split(' ')])
                 lseg = ' '.join([br.replace(line_tag, symbol).replace(caption_tag, symbol) for br in lseg.split(' ')])
-            elif symbol == CAPTION_TAG:
+            elif symbol == cst.CAPTION_TAG:
                 lref = lref.replace(' <eol>', '')
                 lseg = lseg.replace(' <eol>', '')
-            elif symbol == LINE_TAG:
+            elif symbol == cst.LINE_TAG:
                 lref = lref.replace(' <eob>', '')
                 lseg = lseg.replace(' <eob>', '')
 
@@ -83,9 +89,9 @@ def main(args):
 
     # TODO: add ttml processing
     #ttml = args.ttml
-    evaluate_f1(reference_file, system_file, '<eox>', ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
-    evaluate_f1(reference_file, system_file, CAPTION_TAG, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
-    evaluate_f1(reference_file, system_file, LINE_TAG, ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
+    evaluate_f1(reference_file, system_file, '<eox>', ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
+    evaluate_f1(reference_file, system_file, cst.CAPTION_TAG, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
+    evaluate_f1(reference_file, system_file, cst.LINE_TAG, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
 
 
 if __name__ == '__main__':
@@ -94,7 +100,7 @@ if __name__ == '__main__':
 """Tests """
 #reference_file = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.en'
 #system_file = '/home/alin/Desktop/subtitling/02_data/Must-Cinema/en-fr/amara.fr'
-#evaluate_f1(reference_file, system_file, '<eox>', ttml=False, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
+#evaluate_f1(reference_file, system_file, '<eox>', ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
 #get_vectors('Imagine waking up to a stranger -- <eob> sometimes multiple strangers -- <eob> questioning your right to existence <eob> for something that you wrote online, <eob> waking up to an angry message, <eob> scared and worried for your safety. <eob>', '<eob>')
 #def get_break_positions(line, symbol):
 #    # Get actual splits: word before <split> word after

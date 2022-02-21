@@ -12,13 +12,11 @@ if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 from evalsub_main import run_evaluation
+import evalsub.util.constants as cst
 from evalsub.util.degrade_tagged_txt import shift, add, delete, replace
 
 
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
 OUT_DIR_PATH = '.'
-REF_FILE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'amara.en')
 
 
 def parse_args():
@@ -26,7 +24,7 @@ def parse_args():
 
     parser.add_argument('--output_dir', '-od', type=str, default=OUT_DIR_PATH,
                         help="Path to save the degraded files")
-    parser.add_argument('--reference_file', '-ref', type=str, default=REF_FILE_PATH,
+    parser.add_argument('--reference_file', '-ref', type=str, default=cst.REF_FILE_PATH,
                         help="The file to be degraded")
     parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")
@@ -47,9 +45,12 @@ def main(args):
     wrt_n_boundaries = args.with_respect_to == 'n_bound'
 
     # Init dictionary to store metrics
-    eval_metrics = dict(System=[], Mode=[], NU=[], P=[], Change=[],
-                        Win=[], Pk=[], WinDiff=[], Precision=[], Recall=[], F1=[],
-                        BLEU=[], TER_br=[], Len=[], SegSim=[], BoundSim=[])
+    eval_metrics = {cst.SYSTEM: list(), 'Mode': list(), 'NU': list(), 'P': list(), 'Change': list(),
+                    cst.WIN_SIZE: list(), cst.PK: list(), cst.WIN_DIFF: list(),
+                    cst.PRECISION: list(), cst.RECALL: list(), cst.F1: list(),
+                    cst.BLEU_BR: list(), cst.TER_BR: list(),
+                    cst.LENGTH: list(),
+                    cst.SEG_SIM: list(), cst.BOUND_SIM: list()}
 
     # start degrading
     print('Start degrading files.')
@@ -71,8 +72,8 @@ def main(args):
                     print('Degraded file: ' + str(degraded_file))
                     prob_eo = peo / 100
 
-                    stats = shift(ref_file_path, degraded_file, nu, prob_eo, prob_eo, line_tag=LINE_TAG,
-                                  caption_tag=CAPTION_TAG)
+                    stats = shift(ref_file_path, degraded_file, nu, prob_eo, prob_eo, line_tag=cst.LINE_TAG,
+                                  caption_tag=cst.CAPTION_TAG)
 
                     # Collect the stats to compute the rate of change
                     n_eol, n_eob, n_eol_shifts, n_eob_shifts = stats[0], stats[1], stats[2], stats[3]
@@ -94,16 +95,16 @@ def main(args):
                     eval_metrics['NU'].append(0)
                     if not wrt_n_boundaries:
                         prob_eo /= 2
-                    stats = add(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=LINE_TAG,
-                                caption_tag=CAPTION_TAG, wrt_n_boundaries=wrt_n_boundaries)
+                    stats = add(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=cst.LINE_TAG,
+                                caption_tag=cst.CAPTION_TAG, wrt_n_boundaries=wrt_n_boundaries)
                 elif mode == 'delete':
                     eval_metrics['NU'].append(0)
-                    stats = delete(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=LINE_TAG,
-                                   caption_tag=CAPTION_TAG)
+                    stats = delete(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=cst.LINE_TAG,
+                                   caption_tag=cst.CAPTION_TAG)
                 elif mode == 'replace':
                     eval_metrics['NU'].append(0)
-                    stats = replace(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=LINE_TAG,
-                                    caption_tag=CAPTION_TAG)
+                    stats = replace(ref_file_path, degraded_file, prob_eo, prob_eo, line_tag=cst.LINE_TAG,
+                                    caption_tag=cst.CAPTION_TAG)
                 # Collect the stats to compute the rate of change
                 n_eol, n_eob, n_eol_change, n_eob_change = stats
                 rate_eol = n_eol_change / n_eol

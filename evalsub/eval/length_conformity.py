@@ -1,9 +1,11 @@
 # coding: utf-8
-import re
-import argparse
-import statistics
+DESCRIPTION = """
+Computes the percentage of subtitles conforming to a max. length
+"""
 
-DESCRIPTION = """Computes the percentage of subtitles conforming to a max. length"""
+import argparse
+import re
+import statistics
 
 
 def len_conformity(line, MAX_LEN):

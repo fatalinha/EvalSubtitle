@@ -1,24 +1,25 @@
 # coding: utf-8
 
 import random
+import os
 import re
+import sys
 
-from .util import postprocess, preprocess, replace_char, replace_substring
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
-
-MASK_CHAR = '#'
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
-LINE_HOLDER = 'µ'
-CAPTION_HOLDER = '§'
+import evalsub.util.constants as cst
+from evalsub.util.util import postprocess, preprocess, replace_char, replace_substring
 
 ## MIXED  ######################################################################
 
-def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    words = set(re.finditer(r"[^ %s%s\r\n]+" % (LINE_HOLDER, CAPTION_HOLDER), tagged_txt))
+    words = set(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_txt))
     space_positions = [m.start() for m in re.finditer(r" ", tagged_txt)]
 
     n_words = len(words)
@@ -48,10 +49,10 @@ def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=LINE_
 
     # Adding words
     for word_pos in words_to_add:
-        tagged_txt = replace_char(tagged_txt, word_pos, MASK_CHAR)
+        tagged_txt = replace_char(tagged_txt, word_pos, cst.MASK_CHAR)
 
     # Inserting spaces besides masked chars
-    tagged_txt = re.sub(MASK_CHAR, r" %s " % MASK_CHAR, tagged_txt)
+    tagged_txt = re.sub(cst.MASK_CHAR, r" %s " % cst.MASK_CHAR, tagged_txt)
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)

@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 A script to degrade subtitle segmentation (in lines and captions) in a ttml file.
 The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing

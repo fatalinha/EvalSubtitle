@@ -1,4 +1,9 @@
 # coding: utf-8
+DESCRIPTION = """
+The script breaks sentences before a maximum length is reached. Selection of type of break <eol> or <eob> 
+is done randomly.
+"""
+
 try:
     from itertools import izip as zip
 except ImportError:  # will be 3.x series
@@ -7,10 +12,7 @@ from os.path import join
 import argparse
 import random
 
-DESCRIPTION = """
-The script breaks sentences before a maximum length is reached. Selection of type of break <eol> or <eob> 
-is done randomly.
-"""
+
 MAX_POS = 42
 
 

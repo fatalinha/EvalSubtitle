@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 A script to degrade subtitle segmentation (in lines and captions) in a tagged txt file.
 The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing
@@ -7,16 +6,18 @@ boundaries with the other type.
 """
 
 import argparse
+import os
 import random
 import re
+import sys
 
-from .util import postprocess, preprocess, replace_char, write_lines
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
 
-
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
-LINE_HOLDER = 'µ'
-CAPTION_HOLDER = '§'
+import evalsub.util.constants as cst
+from evalsub.util.util import postprocess, preprocess, replace_char
 
 ## SHIFT  ######################################################################
 
@@ -40,7 +41,7 @@ def shift_boundary(tagged_txt, n, slot_positions, i):
     return tagged_txt
 
 
-def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
     Degrade a tagged txt file by shifting some of its boundaries.
 
@@ -55,8 +56,8 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=LINE_TAG,
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    eol_positions = [m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)]
-    eob_positions = [m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)]
+    eol_positions = [m.start() for m in re.finditer(cst.LINE_HOLDER, tagged_txt)]
+    eob_positions = [m.start() for m in re.finditer(cst.CAPTION_HOLDER, tagged_txt)]
     space_positions = [m.start() for m in re.finditer(r" ", tagged_txt)]
 
     n_eol = len(eol_positions)
@@ -83,7 +84,7 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=LINE_TAG,
 
 ## ADD  ########################################################################
 
-def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG,
+def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
         wrt_n_boundaries=False):
     """
     Degrade a tagged txt file by adding new boundaries.
@@ -101,8 +102,8 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    eol_positions = [m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)]
-    eob_positions = [m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)]
+    eol_positions = [m.start() for m in re.finditer(cst.LINE_HOLDER, tagged_txt)]
+    eob_positions = [m.start() for m in re.finditer(cst.CAPTION_HOLDER, tagged_txt)]
     space_positions = [m.start() for m in re.finditer(r" ", tagged_txt)]
 
     n_eol = len(eol_positions)
@@ -124,10 +125,10 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
     eob_to_add.difference_update(eol_to_add)
 
     for eol_pos in eol_to_add:
-        tagged_txt = replace_char(tagged_txt, eol_pos, LINE_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eol_pos, cst.LINE_HOLDER)
 
     for eob_pos in eob_to_add:
-        tagged_txt = replace_char(tagged_txt, eob_pos, CAPTION_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eob_pos, cst.CAPTION_HOLDER)
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
@@ -137,7 +138,7 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, capt
 
 ## DELETE  #####################################################################
 
-def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
     Degrade a tagged txt file by deleting some of its boundaries.
 
@@ -151,8 +152,8 @@ def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, c
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    eol_positions = [m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)]
-    eob_positions = [m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)]
+    eol_positions = [m.start() for m in re.finditer(cst.LINE_HOLDER, tagged_txt)]
+    eob_positions = [m.start() for m in re.finditer(cst.CAPTION_HOLDER, tagged_txt)]
 
     n_eol = len(eol_positions)
     n_eob = len(eob_positions)
@@ -175,7 +176,7 @@ def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, c
 
 ## REPLACE  ####################################################################
 
-def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
     Degrade a tagged txt file by replacing some of its boundaries with the other type
     (eol <--> eob).
@@ -190,8 +191,8 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    eol_positions = [m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)]
-    eob_positions = [m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)]
+    eol_positions = [m.start() for m in re.finditer(cst.LINE_HOLDER, tagged_txt)]
+    eob_positions = [m.start() for m in re.finditer(cst.CAPTION_HOLDER, tagged_txt)]
 
     n_eol = len(eol_positions)
     n_eob = len(eob_positions)
@@ -203,10 +204,10 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
     eob_to_replace = random.sample(eob_positions, n_eob_replacements)
 
     for eol_pos in eol_to_replace:
-        tagged_txt = replace_char(tagged_txt, eol_pos, CAPTION_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eol_pos, cst.CAPTION_HOLDER)
 
     for eob_pos in eob_to_replace:
-        tagged_txt = replace_char(tagged_txt, eob_pos, LINE_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eob_pos, cst.LINE_HOLDER)
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
@@ -217,12 +218,12 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=LINE_TAG, 
 ## MIXED  ######################################################################
 
 def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_eob_del,
-          p_eol_rep, p_eob_rep, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+          p_eol_rep, p_eob_rep, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     print('Initializing...')
     tagged_txt = preprocess(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
-    eol_positions = set([m.start() for m in re.finditer(LINE_HOLDER, tagged_txt)])
-    eob_positions = set([m.start() for m in re.finditer(CAPTION_HOLDER, tagged_txt)])
+    eol_positions = set([m.start() for m in re.finditer(cst.LINE_HOLDER, tagged_txt)])
+    eob_positions = set([m.start() for m in re.finditer(cst.CAPTION_HOLDER, tagged_txt)])
     space_positions = [m.start() for m in re.finditer(r" ", tagged_txt)]
 
     n_eol = len(eol_positions)
@@ -267,15 +268,15 @@ def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_
 
     # Replacing boundaries
     for eol_pos in eol_to_replace:
-        tagged_txt = replace_char(tagged_txt, eol_pos, CAPTION_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eol_pos, cst.CAPTION_HOLDER)
     for eob_pos in eob_to_replace:
-        tagged_txt = replace_char(tagged_txt, eob_pos, LINE_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eob_pos, cst.LINE_HOLDER)
 
     # Adding boundaries
     for eol_pos in eol_to_add:
-        tagged_txt = replace_char(tagged_txt, eol_pos, LINE_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eol_pos, cst.LINE_HOLDER)
     for eob_pos in eob_to_add:
-        tagged_txt = replace_char(tagged_txt, eob_pos, CAPTION_HOLDER)
+        tagged_txt = replace_char(tagged_txt, eob_pos, cst.CAPTION_HOLDER)
 
     print('Writing...')
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)

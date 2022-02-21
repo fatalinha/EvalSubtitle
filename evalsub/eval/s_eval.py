@@ -13,25 +13,20 @@ toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
+import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
 
 
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
-LINE_HOLDER = 'µ'
-CAPTION_HOLDER = '§'
-
-
 def s_preprocess(file_path):
-    tagged_txt = preprocess(file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG, line_holder=LINE_HOLDER,
-                            caption_holder=CAPTION_HOLDER)
+    tagged_txt = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+                            caption_holder=cst.CAPTION_HOLDER)
 
-    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (LINE_HOLDER, CAPTION_HOLDER), tagged_txt)))
-    n_boundaries = len(list(re.finditer(r"%s|%s" % (LINE_HOLDER, CAPTION_HOLDER), tagged_txt)))
+    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_txt)))
+    n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_txt)))
     alpha = n_boundaries / n_words
 
     # Removing boundaries
-    txt = re.sub(r"%s|%s" % (LINE_HOLDER, CAPTION_HOLDER), r" ", tagged_txt)
+    txt = re.sub(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" ", tagged_txt)
     # Removing potential multiple spaces
     txt = re.sub(r" {2,}", r" ", txt)
 
@@ -39,7 +34,7 @@ def s_preprocess(file_path):
     sents = [sent.strip() for sent in sents]
 
     # Inserting spaces besides boundaries
-    tagged_txt = re.sub(r"(%s|%s)" % (LINE_HOLDER, CAPTION_HOLDER), r" \1 ", tagged_txt)
+    tagged_txt = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_txt)
     # Removing potential multiple spaces
     tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
 

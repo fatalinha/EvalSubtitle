@@ -3,11 +3,8 @@
 import argparse
 import re
 
+import constants as cst
 from .util import write_lines
-
-
-LINE_TAG = '<eol>'
-CAPTION_TAG = '<eob>'
 
 
 def hms_to_hmsf(hms):
@@ -110,7 +107,7 @@ class SrtWriter:
         self.file.write(caption_string)
 
 
-def srt_to_tagged_str(srt_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def srt_to_tagged_str(srt_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     srt_reader = SrtReader(srt_file_path)
 
     captions = list()
@@ -130,8 +127,8 @@ def srt_to_tagged_str(srt_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG)
 
 ## MAIN FUNCTIONS  #############################################################
 
-def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, line_tag=LINE_TAG,
-                      caption_tag=CAPTION_TAG):
+def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, line_tag=cst.LINE_TAG,
+                      caption_tag=cst.CAPTION_TAG):
     print('Converting srt into tagged text:')
     print('Reading file...')
     all_sub, time_spans = srt_to_tagged_str(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)

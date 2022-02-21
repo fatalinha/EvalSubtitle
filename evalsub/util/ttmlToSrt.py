@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 A script to convert subtitles from a ttml file to an srt file.
 Some info such as the color of the lines cannot be transferred in srt.

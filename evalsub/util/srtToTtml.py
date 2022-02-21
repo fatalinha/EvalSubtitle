@@ -1,5 +1,4 @@
 # coding: utf-8
-
 DESCRIPTION = """
 A script to convert subtitles from an srt file to a ttml file.
 The color of the lines (not contained in srt) will be set to white by default.
