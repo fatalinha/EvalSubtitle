@@ -34,7 +34,7 @@ def parse_args():
 
     parser.add_argument('--output_dir', '-od', type=str, default=OUT_DIR_PATH,
                         help="Path to save the degraded files")
-    parser.add_argument('--reference_file', '-ref', type=str, default=cst.REF_FILE_PATH,
+    parser.add_argument('--reference_file', '-ref', type=str, default=cst.AMARA_EN,
                         help="The file to be degraded")
     parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")
@@ -58,9 +58,12 @@ def main(args):
     eval_metrics = {cst.SYSTEM: list(), 'Mode': list(), 'NU': list(), 'P': list(), 'Change': list(),
                     cst.WIN_SIZE: list(), cst.PK: list(), cst.WIN_DIFF: list(),
                     cst.PRECISION: list(), cst.RECALL: list(), cst.F1: list(),
-                    cst.BLEU_BR: list(), cst.TER_BR: list(),
+                    cst.BLEU_BR: list(),
                     cst.LENGTH: list(),
                     cst.SEG_SIM: list(), cst.BOUND_SIM: list()}
+
+    if not no_ter:
+        eval_metrics[cst.TER_BR] = list()
 
     # start degrading
     print('Start degrading files.')
@@ -92,7 +95,7 @@ def main(args):
                     rate_change = nu * (peo * rate_eol + peo * rate_eob)
                     eval_metrics['Change'].append(round(rate_change, 3))
                     # Evaluate the degraded files with the metrics
-                    run_evaluation(ref_file_path, degraded_file, eval_metrics, no_ter=no_ter)
+                    run_evaluation(ref_file_path, degraded_file, eval_metrics)
         else:
             for peo in range(20, 120, 20):
                 eval_metrics['Mode'].append(mode)
@@ -122,7 +125,7 @@ def main(args):
                 rate_change = (peo * rate_eol + peo * rate_eob)
                 eval_metrics['Change'].append(round(rate_change, 3))
                 # Evaluate the degraded files with the metrics
-                run_evaluation(ref_file_path, degraded_file, eval_metrics, no_ter=no_ter)
+                run_evaluation(ref_file_path, degraded_file, eval_metrics)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)

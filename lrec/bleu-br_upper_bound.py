@@ -38,7 +38,7 @@ def parse_args():
 
     parser.add_argument('--output_dir', '-od', type=str, default=OUT_DIR_PATH,
                         help="Path to save the degraded files")
-    parser.add_argument('--reference_file', '-ref', type=str, default=cst.REF_FILE_PATH,
+    parser.add_argument('--reference_file', '-ref', type=str, default=cst.AMARA_EN,
                         help="The reference file against which to compute BLEU")
     parser.add_argument('--results_file', '-res', type=str, required=True,
                         help="csv file to write the metric scores")
