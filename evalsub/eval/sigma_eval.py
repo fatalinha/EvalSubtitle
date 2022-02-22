@@ -27,7 +27,7 @@ import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
 
 
-def s_preprocess(file_path):
+def sigma_preprocess(file_path):
     tagged_txt = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
                             caption_holder=cst.CAPTION_HOLDER)
 
@@ -56,11 +56,11 @@ def s_preprocess(file_path):
     return alpha, sents, tagged_sents
 
 
-def s_process(ref_file_path, sys_file_path):
+def sigma_process(ref_file_path, sys_file_path):
     bleu = BLEU()
 
-    ref_alpha, ref_sents, ref_tagged_sents = s_preprocess(ref_file_path)
-    sys_alpha, sys_sents, sys_tagged_sents = s_preprocess(sys_file_path)
+    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path)
+    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path)
 
     bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
     bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])
@@ -76,19 +76,19 @@ def s_process(ref_file_path, sys_file_path):
     pp4_ub = ((1 - 3 * alpha) * p4 + 4 * alpha * p3) / (1 + alpha)
     bleu_br_ub = bpp * exp((log(pp1_ub) + log(pp2_ub) + log(pp3_ub) + log(pp4_ub)) / 4)
 
-    s = 100 * bleu_br / bleu_br_ub
+    sigma = 100 * bleu_br / bleu_br_ub
 
-    s_score = { "S": s,
-                "alpha": alpha,
-                "BLEU_br+": bleu_br_ub,
-                "p'1+": pp1_ub,
-                "p'2+": pp2_ub,
-                "p'3+": pp3_ub,
-                "p'4+": pp4_ub,
-                "BLEU_nb": bleu_nb_score,
-                "BLEU_br": bleu_br_score}
+    sigma_score = { cst.SIGMA: sigma,
+                cst.ALPHA: alpha,
+                cst.BLEU_BR_UB: bleu_br_ub,
+                cst.PP1_UB: pp1_ub,
+                cst.PP2_UB: pp2_ub,
+                cst.PP3_UB: pp3_ub,
+                cst.PP4_UB: pp4_ub,
+                cst.BLEU_NB: bleu_nb_score,
+                cst.BLEU_BR: bleu_br_score}
 
-    return s_score
+    return sigma_score
 
 
 def parse_args():
@@ -105,8 +105,8 @@ def main(args):
     sys_file_path = args.system_file
     ref_file_path = args.reference_file
 
-    s_score = s_process(ref_file_path, sys_file_path)
-    print("S = ", s_score["S"])
+    sigma_score = sigma_process(ref_file_path, sys_file_path)
+    print(cst.SIGMA, "=", sigma_score[cst.SIGMA])
 
 
 if __name__ == '__main__':
