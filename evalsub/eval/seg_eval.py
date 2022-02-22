@@ -37,7 +37,6 @@ EOL = "<eol>"
 EOX = "<eox>"
 EOB_EOL = "<eob>,<eol>"
 TYPES = frozenset({EOB, EOL, EOX, EOB_EOL})
-NT = 2
 
 
 def get_masses(file_path, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
@@ -94,7 +93,7 @@ def masses_to_sets(eob_masses, eol_masses, eox_masses):
 
 
 def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_window_size=None, eob_window_size=None,
-             eox_window_size=None, nt=NT, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+             eox_window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
 
     sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
                                                              caption_tag=caption_tag)
@@ -218,7 +217,7 @@ def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_wind
     return results
 
 
-def get_metrics(sys_file_path, ref_file_path, ttml=False, eox_window_size=None, nt=NT, line_tag=cst.LINE_TAG,
+def get_metrics(sys_file_path, ref_file_path, ttml=False, window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG,
                 caption_tag=cst.CAPTION_TAG):
 
     sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
@@ -231,6 +230,7 @@ def get_metrics(sys_file_path, ref_file_path, ttml=False, eox_window_size=None, 
                                                                                 ref_eox_masses)
 
     print('<eox> segmentation:')
+    eox_window_size = window_size
     # Window size is computed
     if eox_window_size is None:
         eox_window_size = segeval.compute_window_size(ref_eox_masses)

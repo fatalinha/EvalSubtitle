@@ -26,17 +26,19 @@ from evalsub.eval.bleu_eval import bleu_process
 import evalsub.util.constants as cst
 
 
-def run_evaluation(ref_file_path, sys_file_path, results):
+def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT):
     results[cst.SYSTEM].append(os.path.basename(sys_file_path))
 
     if cst.PK in results or cst.WIN_DIFF in results or cst.SEG_SIM in results or cst.BOUND_SIM in results:
-        win_size, pk, win_diff, seg_sim, bound_sim = get_metrics(sys_file_path, ref_file_path)
+        win_size, pk, win_diff, seg_sim, bound_sim = get_metrics(sys_file_path, ref_file_path, window_size=window_size, nt=nt)
         if cst.WIN_SIZE in results:
             results[cst.WIN_SIZE].append(win_size)
         if cst.PK in results:
             results[cst.PK].append(round(pk, 3))
         if cst.WIN_DIFF in results:
             results[cst.WIN_DIFF].append(round(win_diff, 3))
+        if cst.NT in results:
+            results[cst.NT].append(nt)
         if cst.SEG_SIM in results:
             results[cst.SEG_SIM].append(seg_sim)
         if cst.BOUND_SIM in results:
@@ -64,9 +66,9 @@ def run_evaluation(ref_file_path, sys_file_path, results):
             results[cst.F1].append(f1)
 
 
-def run_evaluations(ref_file_path, sys_file_paths, results):
+def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT):
     for sys_file_path in sys_file_paths:
-        run_evaluation(ref_file_path, sys_file_path, results)
+        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt)
 
 ## MAIN  #######################################################################
 
@@ -89,6 +91,11 @@ def parse_args():
                         help="Reference segmented subtitle file.")
     parser.add_argument('--results_file', '-res', type=str,
                         help="CSV file where to write the results.")
+
+    parser.add_argument('--window_size', '-k', type=int,
+                        help="Window size for the window-based segmentation evaluation.")
+    parser.add_argument('--max_transpo', '-n', type=int, default=cst.DEFAULT_NT,
+                        help="Maximum distance that can accounted as a transposition.")
 
     args = parser.parse_args()
     return args
@@ -122,8 +129,10 @@ def main(args):
     sys_file_paths = args.system_files
     ref_file_path = args.reference_file
     res_file_path = args.results_file
+    window_size = args.window_size
+    nt = args.max_transpo
 
-    run_evaluations(ref_file_path, sys_file_paths, results)
+    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)

@@ -65,3 +65,5 @@ PP1_UB = "p'1+"
 PP2_UB = "p'2+"
 PP3_UB = "p'3+"
 PP4_UB = "p'4+"
+
+DEFAULT_NT = 2
