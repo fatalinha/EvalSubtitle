@@ -57,8 +57,9 @@ E2E_METRICS = [BLEU_BR, BLEU_NB, TER_BR,
 DEFAULT_METRICS = [BLEU_BR]
 
 SYSTEM = 'System'
-WIN_SIZE = 'WinSize'
-ALPHA = 'Alpha'
+WIN_SIZE = 'k'
+NT = 'n_t'
+ALPHA = 'alpha'
 BLEU_BR_UB = 'BLEU_br+'
 PP1_UB = "p'1+"
 PP2_UB = "p'2+"

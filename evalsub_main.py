@@ -31,11 +31,16 @@ def run_evaluation(ref_file_path, sys_file_path, results):
 
     if cst.PK in results or cst.WIN_DIFF in results or cst.SEG_SIM in results or cst.BOUND_SIM in results:
         win_size, pk, win_diff, seg_sim, bound_sim = get_metrics(sys_file_path, ref_file_path)
-        results[cst.WIN_SIZE].append(win_size)
-        results[cst.PK].append(round(pk, 3))
-        results[cst.WIN_DIFF].append(round(win_diff, 3))
-        results[cst.SEG_SIM].append(seg_sim)
-        results[cst.BOUND_SIM].append(bound_sim)
+        if cst.WIN_SIZE in results:
+            results[cst.WIN_SIZE].append(win_size)
+        if cst.PK in results:
+            results[cst.PK].append(round(pk, 3))
+        if cst.WIN_DIFF in results:
+            results[cst.WIN_DIFF].append(round(win_diff, 3))
+        if cst.SEG_SIM in results:
+            results[cst.SEG_SIM].append(seg_sim)
+        if cst.BOUND_SIM in results:
+            results[cst.BOUND_SIM].append(bound_sim)
 
     if cst.LENGTH in results:
         len_conf = len_process(sys_file_path, 42)
@@ -51,9 +56,12 @@ def run_evaluation(ref_file_path, sys_file_path, results):
 
     if cst.PRECISION in results or cst.RECALL in results or cst.F1 in results:
         precision, recall, f1 = evaluate_f1(ref_file_path, sys_file_path, '<eox>', ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
-        results[cst.PRECISION].append(precision)
-        results[cst.RECALL].append(recall)
-        results[cst.F1].append(f1)
+        if cst.PRECISION in results:
+            results[cst.PRECISION].append(precision)
+        if cst.RECALL in results:
+            results[cst.RECALL].append(recall)
+        if cst.F1 in results:
+            results[cst.F1].append(f1)
 
 
 def run_evaluations(ref_file_path, sys_file_paths, results):
@@ -104,6 +112,12 @@ def main(args):
 
     results = {metric: list() for metric in metrics}
     results[cst.SYSTEM] = list()
+    # Window size is saved if Pk or WindowDiff is computed
+    if cst.PK in results or cst.WIN_DIFF in results:
+        results[cst.WIN_SIZE] = list()
+    # Transposition span is saved if SegSim or BoundSim is computed
+    if cst.SEG_SIM in results or cst.BOUND_SIM in results:
+        results[cst.NT] = list()
 
     sys_file_paths = args.system_files
     ref_file_path = args.reference_file
