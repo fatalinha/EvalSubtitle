@@ -22,7 +22,6 @@ from evalsub.eval.seg_eval import get_metrics
 from evalsub.eval.f1_eval import evaluate_f1
 from evalsub.eval.length_conformity import len_process
 from evalsub.eval.ter_eval import ter_process
-from evalsub.eval.bleu_eval import bleu_process
 from evalsub.eval.sigma_eval import sigma_process
 import evalsub.util.constants as cst
 
@@ -89,6 +88,8 @@ def parse_args():
 
     parser.add_argument('--all', '-a', action='store_true',
                         help="Compute all metrics.")
+    parser.add_argument('--standard', '-std', action='store_true',
+                        help="Compute all metrics that require identical text.")
     parser.add_argument('--end2end', '-e2e', action='store_true',
                         help="Compute all metrics that do not require identical text.")
     parser.add_argument('--include', '-i', type=str, nargs='+',
@@ -115,13 +116,20 @@ def parse_args():
 
 def main(args):
     all_metrics = args.all
+    standard_metrics = args.standard
     end2end_metrics = args.end2end
     included_metrics = args.include
     excluded_metrics = args.exclude
-    if not all_metrics and not end2end_metrics and included_metrics is None and excluded_metrics is None:
+    if not all_metrics and not standard_metrics and not end2end_metrics and included_metrics is None and excluded_metrics is None:
         metrics = cst.DEFAULT_METRICS
     else:
-        metrics = set(cst.E2E_METRICS) if end2end_metrics else set(cst.VALID_METRICS)
+        if standard_metrics:
+            metrics = set(cst.STD_METRICS)
+        elif end2end_metrics:
+            metrics = set(cst.E2E_METRICS)
+        else:
+            metrics = set(cst.VALID_METRICS)
+
         if included_metrics is not None:
             metrics.intersection_update(included_metrics)
         if excluded_metrics is not None:

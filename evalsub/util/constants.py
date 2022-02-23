@@ -47,6 +47,10 @@ VALID_METRICS = [PRECISION, RECALL, F1,
                  LENGTH,
                  SIGMA]
 
+STD_METRICS = [PRECISION, RECALL, F1,
+               PK, WIN_DIFF,
+               SEG_SIM, BOUND_SIM]
+
 E2E_METRICS = [BLEU_BR, BLEU_NB, TER_BR,
                LENGTH,
                SIGMA]
