@@ -23,6 +23,7 @@ from evalsub.eval.f1_eval import evaluate_f1
 from evalsub.eval.length_conformity import len_process
 from evalsub.eval.ter_eval import ter_process
 from evalsub.eval.bleu_eval import bleu_process
+from evalsub.eval.sigma_eval import sigma_process
 import evalsub.util.constants as cst
 
 
@@ -48,9 +49,20 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         len_conf = len_process(sys_file_path, 42)
         results[cst.LENGTH].append(len_conf)
 
-    if cst.BLEU_BR in results:
-        bleu_br = bleu_process(ref_file_path, sys_file_path).score
-        results[cst.BLEU_BR].append(bleu_br)
+    if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
+        sigma_score = sigma_process(ref_file_path, sys_file_path)
+        bleu_br = sigma_score[cst.BLEU_BR]
+        bleu_nb = sigma_score[cst.BLEU_NB]
+        alpha = sigma_score[cst.ALPHA]
+        sigma = sigma_score[cst.SIGMA]
+        if cst.BLEU_BR in results:
+            results[cst.BLEU_BR].append(bleu_br)
+        if cst.BLEU_NB in results:
+            results[cst.BLEU_NB].append(bleu_nb)
+        if cst.ALPHA in results:
+            results[cst.ALPHA].append(alpha)
+        if cst.SIGMA in results:
+            results[cst.SIGMA].append(sigma)
 
     if cst.TER_BR in results:
         ter_br = ter_process(ref_file_path, sys_file_path).score
@@ -125,6 +137,9 @@ def main(args):
     # Transposition span is saved if SegSim or BoundSim is computed
     if cst.SEG_SIM in results or cst.BOUND_SIM in results:
         results[cst.NT] = list()
+    # Boundaries to words ratio (alpha) is saved if Sigma is computed
+    if cst.SIGMA in results:
+        results[cst.ALPHA] = list()
 
     sys_file_paths = args.system_files
     ref_file_path = args.reference_file

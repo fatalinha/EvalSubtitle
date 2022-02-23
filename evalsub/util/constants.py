@@ -51,10 +51,8 @@ E2E_METRICS = [BLEU_BR, BLEU_NB, TER_BR,
                LENGTH,
                SIGMA]
 
-# DEFAULT_METRICS = [BLEU_BR, BLEU_NB,
-#                    SIGMA]
-
-DEFAULT_METRICS = [BLEU_BR]
+DEFAULT_METRICS = [BLEU_BR, BLEU_NB,
+                   SIGMA]
 
 SYSTEM = 'System'
 WIN_SIZE = 'k'
