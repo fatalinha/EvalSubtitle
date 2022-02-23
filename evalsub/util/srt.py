@@ -143,27 +143,36 @@ def srt_to_tagged_str(srt_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPT
 
     return tagged_str, time_spans
 
+
+def find_eos(tagged_str, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+    return [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?])([")])?( )?(%s|%s)' % (line_tag, caption_tag), tagged_str)]
+
+
+def srt_to_tagged_sents(srt_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+    tagged_str, time_spans = srt_to_tagged_str(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
+    eos_positions = find_eos(tagged_str, line_tag=line_tag, caption_tag=caption_tag)
+
+    tagged_sents = list()
+    start_pos = 0
+    for end_pos in eos_positions:
+        tagged_sent = tagged_str[start_pos:end_pos]
+        tagged_sent = tagged_sent.strip()
+        tagged_sents.append(tagged_sent)
+        start_pos = end_pos
+
+    return tagged_sents, time_spans
+
+
 ## MAIN FUNCTIONS  #############################################################
 
 def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, line_tag=cst.LINE_TAG,
                       caption_tag=cst.CAPTION_TAG):
     print('Converting srt into tagged text:')
-    print('Reading file...')
-    tagged_str, time_spans = srt_to_tagged_str(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
-
-    print('Segmenting into sentences...')
-    sub_eos_positions = [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?])([")])?( )?%s' % caption_tag, tagged_str)]
-
-    sub_segments = list()
-    start_pos = 0
-    for end_pos in sub_eos_positions:
-        sub_segment = tagged_str[start_pos:end_pos]
-        sub_segment = sub_segment.strip()
-        sub_segments.append(sub_segment)
-        start_pos = end_pos
+    print('Reading and segmenting file...')
+    tagged_sents, time_spans = srt_to_tagged_sents(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
     print('Writing...')
-    write_lines(sub_segments, tagged_txt_file_path)
+    write_lines(tagged_sents, tagged_txt_file_path)
     if timecode_file_path is not None:
         write_lines(time_spans, timecode_file_path)
 

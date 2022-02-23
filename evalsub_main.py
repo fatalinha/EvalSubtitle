@@ -20,7 +20,7 @@ import pandas as pd
 
 from evalsub.eval.seg_eval import seg_process
 from evalsub.eval.f1_eval import evaluate_f1
-from evalsub.eval.length_conformity import cpl_process
+from evalsub.eval.cpl_eval import cpl_process
 from evalsub.eval.ter_eval import ter_process
 from evalsub.eval.sigma_eval import sigma_process
 import evalsub.util.constants as cst
@@ -52,7 +52,7 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         results[cst.CPL_CONF].append(cpl_conf)
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
-        sigma_score = sigma_process(ref_file_path, sys_file_path)
+        sigma_score = sigma_process(ref_file_path, sys_file_path, srt=srt)
         bleu_br = sigma_score[cst.BLEU_BR]
         bleu_nb = sigma_score[cst.BLEU_NB]
         alpha = sigma_score[cst.ALPHA]

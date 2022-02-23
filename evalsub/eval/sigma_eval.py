@@ -27,9 +27,9 @@ import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
 
 
-def sigma_preprocess(file_path):
+def sigma_preprocess(file_path, srt=False):
     tagged_str = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-                            caption_holder=cst.CAPTION_HOLDER)
+                            caption_holder=cst.CAPTION_HOLDER, srt=srt)
 
     n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
     n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
@@ -56,11 +56,11 @@ def sigma_preprocess(file_path):
     return alpha, sents, tagged_sents
 
 
-def sigma_process(ref_file_path, sys_file_path):
+def sigma_process(ref_file_path, sys_file_path, srt=False):
     bleu = BLEU()
 
-    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path)
-    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path)
+    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path, srt=srt)
+    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path, srt=srt)
 
     bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
     bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])

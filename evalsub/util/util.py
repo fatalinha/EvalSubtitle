@@ -19,7 +19,7 @@ toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
-from evalsub.util.srt import srt_to_tagged_str
+from evalsub.util.srt import srt_to_tagged_sents
 import evalsub.util.constants as cst
 
 
@@ -39,9 +39,9 @@ def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag
 
 
 def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-               caption_holder=cst.CAPTION_HOLDER):
+               caption_holder=cst.CAPTION_HOLDER, srt=False):
     r"""
-    Preprocess the text from a tagged txt file.
+    Preprocess the text from a tagged txt or srt file.
 
     Removing potential multiple spaces.
     Removing potential spaces in the beginning of file lines.
@@ -53,14 +53,20 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
     INPUT - "The cat <eol> is black. <eob>\\nHe's sleeping. <eob>\\n"
     OUTPUT - "The catµis black.§\\nHe's sleeping.§\\n"
 
-    :param input_file_path: tagged txt file
+    :param input_file_path: input file
     :param line_tag: end-of-line tag
     :param caption_tag: end-of-bloc/caption tag
     :param line_holder: placeholder for end-of-line tag
     :param caption_holder: placeholder for end-of-bloc/caption tag
+    :param srt: wether the input file is in srt format
     :return: Preprocessed string
     """
-    tagged_str = open(input_file_path).read()
+    if srt:
+        tagged_sents, _ = srt_to_tagged_sents(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
+        tagged_str = '\n'.join(tagged_sents)
+    else:
+        tagged_str = open(input_file_path).read()
+
     # Removing potential multiple spaces
     tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Removing potential spaces in the beginning of file lines
