@@ -19,22 +19,23 @@ toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
+from evalsub.util.srt import srt_to_tagged_str
 import evalsub.util.constants as cst
 
 
-def postprocess(tagged_txt, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
                 caption_holder=cst.CAPTION_HOLDER):
     # Replacing 1-char placeholders with boundaries
-    tagged_txt = re.sub(line_holder, line_tag, tagged_txt)
-    tagged_txt = re.sub(caption_holder, caption_tag, tagged_txt)
+    tagged_str = re.sub(line_holder, line_tag, tagged_str)
+    tagged_str = re.sub(caption_holder, caption_tag, tagged_str)
     # Inserting spaces besides boundaries
-    tagged_txt = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", tagged_txt)
+    tagged_str = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", tagged_str)
     # Removing potential multiple spaces
-    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Segmenting in file lines
-    tagged_txt = [line.strip() for line in tagged_txt.splitlines()]
+    tagged_lines = [line.strip() for line in tagged_str.splitlines()]
     # Writing
-    write_lines(tagged_txt, output_file_path)
+    write_lines(tagged_lines, output_file_path)
 
 
 def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
@@ -44,7 +45,7 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
 
     Removing potential multiple spaces.
     Removing potential spaces in the beginning of file lines.
-    Removing spaces besides boundaries.
+    Removing spaces around boundaries.
     Replacing boundaries with 1-char placeholders.
 
     Exple:
@@ -59,18 +60,18 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
     :param caption_holder: placeholder for end-of-bloc/caption tag
     :return: Preprocessed string
     """
-    tagged_txt = open(input_file_path).read()
+    tagged_str = open(input_file_path).read()
     # Removing potential multiple spaces
-    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Removing potential spaces in the beginning of file lines
-    tagged_txt = re.sub(r"\n ", r"\n", tagged_txt)
-    # Removing spaces besides boundaries
-    tagged_txt = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_txt)
+    tagged_str = re.sub(r"\n ", r"\n", tagged_str)
+    # Removing spaces around boundaries
+    tagged_str = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_str)
     # Replacing boundaries with 1-char placeholders
-    tagged_txt = re.sub(line_tag, line_holder, tagged_txt)
-    tagged_txt = re.sub(caption_tag, caption_holder, tagged_txt)
+    tagged_str = re.sub(line_tag, line_holder, tagged_str)
+    tagged_str = re.sub(caption_tag, caption_holder, tagged_str)
 
-    return tagged_txt
+    return tagged_str
 
 
 def replace_char(string, pos, c):

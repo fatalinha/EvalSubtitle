@@ -37,14 +37,14 @@ BOUND_SIM = 'BoundSim'
 BLEU_BR = 'BLEU_br'
 BLEU_NB = 'BLEU_nb'
 TER_BR = 'TER_br'
-LENGTH = 'Length'
+CPL_CONF = 'Length'
 SIGMA = 'Sigma'
 
 VALID_METRICS = [PRECISION, RECALL, F1,
                  PK, WIN_DIFF,
                  SEG_SIM, BOUND_SIM,
                  BLEU_BR, BLEU_NB, TER_BR,
-                 LENGTH,
+                 CPL_CONF,
                  SIGMA]
 
 STD_METRICS = [PRECISION, RECALL, F1,
@@ -52,7 +52,7 @@ STD_METRICS = [PRECISION, RECALL, F1,
                SEG_SIM, BOUND_SIM]
 
 E2E_METRICS = [BLEU_BR, BLEU_NB, TER_BR,
-               LENGTH,
+               CPL_CONF,
                SIGMA]
 
 DEFAULT_METRICS = [BLEU_BR, BLEU_NB,
@@ -69,3 +69,4 @@ PP3_UB = "p'3+"
 PP4_UB = "p'4+"
 
 DEFAULT_NT = 2
+MAX_CPL = 42

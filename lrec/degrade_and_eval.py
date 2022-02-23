@@ -59,7 +59,7 @@ def main(args):
                     cst.WIN_SIZE: list(), cst.PK: list(), cst.WIN_DIFF: list(),
                     cst.PRECISION: list(), cst.RECALL: list(), cst.F1: list(),
                     cst.BLEU_BR: list(),
-                    cst.LENGTH: list(),
+                    cst.CPL_CONF: list(),
                     cst.SEG_SIM: list(), cst.BOUND_SIM: list()}
 
     if not no_ter:

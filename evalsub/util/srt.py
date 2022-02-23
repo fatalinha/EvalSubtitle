@@ -83,6 +83,14 @@ class SrtReader:
         else:
             self.caption = SrtCaption(file_lines)
             return True
+
+    def read_all(self):
+        captions = list()
+        while self.read_caption():
+            caption = self.current_lines()
+            captions.append(caption)
+
+        return captions
     
     def current_index(self):
         return self.caption.index
@@ -128,12 +136,12 @@ def srt_to_tagged_str(srt_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPT
         time_span = '%s %s' % srt_reader.current_time_span()
         time_spans.append(time_span)
 
-    all_sub = caption_tag.join([line_tag.join(caption) for caption in captions]) + caption_tag
-    all_sub = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", all_sub).strip()
+    tagged_str = caption_tag.join([line_tag.join(caption) for caption in captions]) + caption_tag
+    tagged_str = re.sub(r"(%s|%s)" % (line_tag, caption_tag), r" \1 ", tagged_str).strip()
 
     srt_reader.close()
 
-    return all_sub, time_spans
+    return tagged_str, time_spans
 
 ## MAIN FUNCTIONS  #############################################################
 
@@ -141,15 +149,15 @@ def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, l
                       caption_tag=cst.CAPTION_TAG):
     print('Converting srt into tagged text:')
     print('Reading file...')
-    all_sub, time_spans = srt_to_tagged_str(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
+    tagged_str, time_spans = srt_to_tagged_str(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
     print('Segmenting into sentences...')
-    sub_eos_positions = [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?])([")])?( )?%s' % caption_tag, all_sub)]
+    sub_eos_positions = [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?])([")])?( )?%s' % caption_tag, tagged_str)]
 
     sub_segments = list()
     start_pos = 0
     for end_pos in sub_eos_positions:
-        sub_segment = all_sub[start_pos:end_pos]
+        sub_segment = tagged_str[start_pos:end_pos]
         sub_segment = sub_segment.strip()
         sub_segments.append(sub_segment)
         start_pos = end_pos
@@ -161,7 +169,7 @@ def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, l
 
 
 def tagged_txt_to_srt(srt_file_path, tagged_txt_file_path, timecode_file_path):
-    print("to do")
+    print("to do") # TODO?
 
 ## MAIN  #######################################################################
 

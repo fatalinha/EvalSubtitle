@@ -28,6 +28,7 @@ if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
+from evalsub.util.srt import srt_to_tagged_str
 from evalsub.util.ttml import ttml_to_tagged_str
 
 
@@ -39,37 +40,40 @@ EOB_EOL = "<eob>,<eol>"
 TYPES = frozenset({EOB, EOL, EOX, EOB_EOL})
 
 
-def get_masses(file_path, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
     Get the segmentation masses from a segmented subtitle file.
 
     :param file_path: segmented subtitle file (ttml or tagged text)
+    :param srt: wether file_path is in srt format
     :param ttml: whether file_path is in ttml format
     :param line_tag: end of line boundary tag
     :param caption_tag: end of caption/block boundary tag
     :return: segmentation masses (segeval.BoundaryFormat.mass format)
     """
     if ttml:
-        file_str, _ = ttml_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+        tagged_str, _ = ttml_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+    elif srt:
+        tagged_str, _ = srt_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
     else:
-        file_str = ' '.join([line.strip() for line in open(file_path).readlines()])
+        tagged_str = ' '.join([line.strip() for line in open(file_path).readlines()])
 
     # Quick pre-processing before splitting
     # Removing (potential) multiple spaces
-    file_str = re.sub(r" {2,}", r" ", file_str)
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Removing spaces around boundaries
-    file_str = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", file_str)
+    tagged_str = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_str)
     # Removing (potential) ending boundary
-    file_str = re.sub(r"%s$" % caption_tag, r"", file_str)
+    tagged_str = re.sub(r"%s$" % caption_tag, r"", tagged_str)
 
     # <eob> only segmentation
-    eob_str = re.sub(line_tag, r" ", file_str)
+    eob_str = re.sub(line_tag, r" ", tagged_str)
     eob_masses = [len(segment.split()) for segment in eob_str.split(caption_tag)]
     # <eol> only segmentation
-    eol_str = re.sub(caption_tag, r" ", file_str)
+    eol_str = re.sub(caption_tag, r" ", tagged_str)
     eol_masses = [len(segment.split()) for segment in eol_str.split(line_tag)]
     # <eox> (<eol> = <eob>) segmentation
-    eox_str = re.sub(caption_tag, line_tag, file_str)
+    eox_str = re.sub(caption_tag, line_tag, tagged_str)
     eox_masses = [len(segment.split()) for segment in eox_str.split(line_tag)]
 
     return eob_masses, eol_masses, eox_masses
@@ -92,12 +96,13 @@ def masses_to_sets(eob_masses, eol_masses, eox_masses):
     return eob_sets, eol_sets, eox_sets, eob_eol_sets
 
 
-def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_window_size=None, eob_window_size=None,
-             eox_window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,srt=False, ttml=False, eol_window_size=None,
+             eob_window_size=None, eox_window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG,
+             caption_tag=cst.CAPTION_TAG):
 
-    sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
+    sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
                                                              caption_tag=caption_tag)
-    ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, ttml=ttml, line_tag=line_tag,
+    ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
                                                              caption_tag=caption_tag)
     sys_eob_sets, sys_eol_sets, sys_eox_sets, sys_eob_eol_sets = masses_to_sets(sys_eob_masses, sys_eol_masses,
                                                                                 sys_eox_masses)
@@ -217,12 +222,12 @@ def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,ttml=False, eol_wind
     return results
 
 
-def get_metrics(sys_file_path, ref_file_path, ttml=False, window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG,
-                caption_tag=cst.CAPTION_TAG):
+def seg_process(sys_file_path, ref_file_path, srt=False, ttml=False, window_size=None, nt=cst.DEFAULT_NT,
+                line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
 
-    sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, ttml=ttml, line_tag=line_tag,
+    sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
                                                                 caption_tag=caption_tag)
-    ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, ttml=ttml, line_tag=line_tag,
+    ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
                                                                 caption_tag=caption_tag)
     sys_eob_sets, sys_eol_sets, sys_eox_sets, sys_eob_eol_sets = masses_to_sets(sys_eob_masses, sys_eol_masses,
                                                                                 sys_eox_masses)

@@ -28,27 +28,27 @@ from evalsub.util.util import preprocess
 
 
 def sigma_preprocess(file_path):
-    tagged_txt = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+    tagged_str = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
                             caption_holder=cst.CAPTION_HOLDER)
 
-    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_txt)))
-    n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_txt)))
+    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
+    n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
     alpha = n_boundaries / n_words
 
     # Removing boundaries
-    txt = re.sub(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" ", tagged_txt)
+    string = re.sub(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" ", tagged_str)
     # Removing potential multiple spaces
-    txt = re.sub(r" {2,}", r" ", txt)
+    string = re.sub(r" {2,}", r" ", string)
 
-    sents = txt.splitlines()
+    sents = string.splitlines()
     sents = [sent.strip() for sent in sents]
 
     # Inserting spaces besides boundaries
-    tagged_txt = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_txt)
+    tagged_str = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_str)
     # Removing potential multiple spaces
-    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
 
-    tagged_sents = tagged_txt.splitlines()
+    tagged_sents = tagged_str.splitlines()
     tagged_sents = [tagged_sent.strip() for tagged_sent in tagged_sents]
 
     assert len(sents) == len(tagged_sents)

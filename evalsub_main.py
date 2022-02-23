@@ -18,19 +18,22 @@ import os.path
 
 import pandas as pd
 
-from evalsub.eval.seg_eval import get_metrics
+from evalsub.eval.seg_eval import seg_process
 from evalsub.eval.f1_eval import evaluate_f1
-from evalsub.eval.length_conformity import len_process
+from evalsub.eval.length_conformity import cpl_process
 from evalsub.eval.ter_eval import ter_process
 from evalsub.eval.sigma_eval import sigma_process
 import evalsub.util.constants as cst
 
 
-def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT):
+def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
+                   srt=False):
+
     results[cst.SYSTEM].append(os.path.basename(sys_file_path))
 
     if cst.PK in results or cst.WIN_DIFF in results or cst.SEG_SIM in results or cst.BOUND_SIM in results:
-        win_size, pk, win_diff, seg_sim, bound_sim = get_metrics(sys_file_path, ref_file_path, window_size=window_size, nt=nt)
+        win_size, pk, win_diff, seg_sim, bound_sim = seg_process(sys_file_path, ref_file_path, srt=srt,
+                                                                 window_size=window_size, nt=nt)
         if cst.WIN_SIZE in results:
             results[cst.WIN_SIZE].append(win_size)
         if cst.PK in results:
@@ -44,9 +47,9 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         if cst.BOUND_SIM in results:
             results[cst.BOUND_SIM].append(bound_sim)
 
-    if cst.LENGTH in results:
-        len_conf = len_process(sys_file_path, 42)
-        results[cst.LENGTH].append(len_conf)
+    if cst.CPL_CONF in results:
+        cpl_conf = cpl_process(sys_file_path, max_cpl=max_cpl, srt=srt)
+        results[cst.CPL_CONF].append(cpl_conf)
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
         sigma_score = sigma_process(ref_file_path, sys_file_path)
@@ -68,7 +71,8 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         results[cst.TER_BR].append(ter_br)
 
     if cst.PRECISION in results or cst.RECALL in results or cst.F1 in results:
-        precision, recall, f1 = evaluate_f1(ref_file_path, sys_file_path, '<eox>', ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
+        precision, recall, f1 = evaluate_f1(ref_file_path, sys_file_path, '<eox>', ttml=False, line_tag=cst.LINE_TAG,
+                                            caption_tag=cst.CAPTION_TAG)
         if cst.PRECISION in results:
             results[cst.PRECISION].append(precision)
         if cst.RECALL in results:
@@ -77,9 +81,9 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
             results[cst.F1].append(f1)
 
 
-def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT):
+def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, srt=False):
     for sys_file_path in sys_file_paths:
-        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt)
+        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, srt=srt)
 
 ## MAIN  #######################################################################
 
@@ -105,10 +109,15 @@ def parse_args():
     parser.add_argument('--results_file', '-res', type=str,
                         help="CSV file where to write the results.")
 
+    parser.add_argument('--srt', '-srt', action='store_true',
+                        help="Wether the subtitle files are in srt format.")
+
     parser.add_argument('--window_size', '-k', type=int,
                         help="Window size for the window-based segmentation evaluation.")
     parser.add_argument('--max_transpo', '-n', type=int, default=cst.DEFAULT_NT,
                         help="Maximum distance that can accounted as a transposition.")
+    parser.add_argument('--max_cpl', '-cpl', type=int, default=cst.MAX_CPL,
+                        help="Maximum allowed length for subtitle lines.")
 
     args = parser.parse_args()
     return args
@@ -152,10 +161,12 @@ def main(args):
     sys_file_paths = args.system_files
     ref_file_path = args.reference_file
     res_file_path = args.results_file
+    srt = args.srt
     window_size = args.window_size
     nt = args.max_transpo
+    max_cpl = args.max_cpl
 
-    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt)
+    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, srt=srt)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)
