@@ -132,7 +132,7 @@ def main(args):
         df.to_csv(out, index=False, header=True)
 
     # plot Sigma
-    s_plot = pd.DataFrame(eval_metrics["S"], index=df[cst.SYSTEM])
+    s_plot = pd.DataFrame(eval_metrics[cst.SIGMA], index=df[cst.SYSTEM])
     s_plot.plot(kind="bar")
     plt.xlabel(cst.SYSTEM)
     plt.ylabel(cst.SIGMA)

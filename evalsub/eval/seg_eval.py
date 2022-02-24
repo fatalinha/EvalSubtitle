@@ -193,31 +193,31 @@ def seg_process(sys_file_path, ref_file_path, srt=False, ttml=False, window_size
     ref_eob_sets, ref_eol_sets, ref_eox_sets, ref_eob_eol_sets = masses_to_sets(ref_eob_masses, ref_eol_masses,
                                                                                 ref_eox_masses)
 
-    print('<eox> segmentation:')
+    print('%s=%s segmentation:' % (line_tag, caption_tag))
     eox_window_size = window_size
     # Window size is computed
     if eox_window_size is None:
         eox_window_size = segeval.compute_window_size(ref_eox_masses)
-    print('  window_size =', eox_window_size)
+    print('  %s = %d' % (cst.WIN_SIZE, eox_window_size))
     # Pk is computed
     eox_pk = segeval.pk(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
-    print('  Pk = %.3f' % eox_pk)
+    print('  %s = %.3f' % (cst.PK, eox_pk))
     pk = float(eox_pk)
     # WindowDiff is computed
     eox_window_diff = segeval.window_diff(sys_eox_masses, ref_eox_masses, window_size=eox_window_size)
-    print('  WindowDiff = %.3f' % eox_window_diff)
+    print('  %s = %.3f' % (cst.WIN_DIFF, eox_window_diff))
     window_diff = float(eox_window_diff)
 
-    print('<eob>,<eol> segmentation:')
+    print('%s,%s segmentation:' % (line_tag, caption_tag))
     # Segmentation Similarity is computed
     eob_eol_seg_sim = segeval.segmentation_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
                                                       boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
-    print('  S = %.3f' % eob_eol_seg_sim)
+    print('  %s = %.3f' % (cst.SEG_SIM, eob_eol_seg_sim))
     seg_sim = float(eob_eol_seg_sim)
     # Boundary Similarity is computed
     eob_eol_bound_sim = segeval.boundary_similarity(sys_eob_eol_sets, ref_eob_eol_sets,
                                                     boundary_format=segeval.BoundaryFormat.sets, n_t=nt)
-    print('  B = %.3f' % eob_eol_bound_sim)
+    print('  %s = %.3f' % (cst.BOUND_SIM, eob_eol_bound_sim))
     bound_sim = float(eob_eol_bound_sim)
 
     return eox_window_size, pk, window_diff, seg_sim, bound_sim
