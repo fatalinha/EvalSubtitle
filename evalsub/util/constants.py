@@ -38,7 +38,7 @@ BOUND_SIM = 'BoundSim'
 BLEU_BR = 'BLEU_br'
 BLEU_NB = 'BLEU_nb'
 TER_BR = 'TER_br'
-CPL_CONF = 'Length'
+CPL_CONF = 'CPL_conf'
 SIGMA = 'Sigma'
 
 VALID_METRICS = [PRECISION, RECALL, F1,
