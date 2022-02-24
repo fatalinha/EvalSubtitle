@@ -23,7 +23,7 @@ if toplevel_path not in sys.path:
 
 from evalsub_main import run_evaluation
 import evalsub.util.constants as cst
-from evalsub.util.degrade_tagged_txt import shift, add, delete, replace
+from evalsub.util.degrade_tags import shift, add, delete, replace
 
 
 OUT_DIR_PATH = '.'

@@ -26,7 +26,7 @@ if toplevel_path not in sys.path:
 
 from evalsub.eval.bleu_eval import bleu_process
 import evalsub.util.constants as cst
-from evalsub.util.degrade_tagged_txt import mixed as mixed_tags
+from evalsub.util.degrade_tags import mixed as mixed_tags
 from evalsub.util.degrade_txt import mixed as mixed_txt
 
 
