@@ -16,14 +16,19 @@ Selection of type of break <eol> or <eob> is done randomly by specifying the pro
 """
 
 import argparse
+import os
 import random
+import sys
+
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
+
+import evalsub.util.constants as cst
 
 
-MAX_POS = 42
-PROBABILITY = 0.5
-
-
-def insert_symbol(in_str: str, max_pos: int, symbol: str = '<eob>', prob: float = PROBABILITY) -> str:
+def insert_symbol(in_str: str, max_pos: int, symbol: str = cst.CAPTION_TAG, prob: float = cst.PROBA) -> str:
 
     # If the string is too short, just return it
     if len(in_str) <= max_pos:
@@ -45,9 +50,9 @@ def insert_symbol(in_str: str, max_pos: int, symbol: str = '<eob>', prob: float 
         # Select type of symbol randomly
         roll = random.random()
         if roll < prob:
-            symbol = '<eol>'
+            symbol = cst.LINE_TAG
         else:
-            symbol = '<eob>'
+            symbol = cst.CAPTION_TAG
         # Insert the symbol and return
         buffer.append(in_str[0:last_space_pos] + symbol)
         in_str = in_str[last_space_pos:]
@@ -64,9 +69,9 @@ def parse_args():
                         help="Text file with sentences")
     parser.add_argument('--output_file', '-of', type=str,
                         help="Text file with sentences separated by symbols")
-    parser.add_argument('--max_length', '-ln', type=str, default=MAX_POS,
+    parser.add_argument('--max_length', '-ln', type=str, default=cst.MAX_CPL,
                         help="Maximum length of subtitle")
-    parser.add_argument('--probability', '-p', type=str, default=PROBABILITY,
+    parser.add_argument('--probability', '-p', type=str, default=cst.PROBA,
                         help="Probability of break being <eol>")
 
     args = parser.parse_args()
@@ -80,7 +85,7 @@ def main(args):
     with open(infile, 'r') as inf, open(outfile, 'w') as w:
         for line in inf:
             line = line.strip()
-            s2 = insert_symbol(in_str=line, max_pos=MAX_POS, prob=PROBABILITY)
+            s2 = insert_symbol(in_str=line, max_pos=cst.MAX_CPL, prob=cst.PROBA)
             print("Input string: '{}'".format(line))
             print("With symbols : '{}'".format(s2))
             w.write(s2 + '\n')

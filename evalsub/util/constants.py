@@ -83,3 +83,4 @@ PP4_UB = "p'4+"
 
 DEFAULT_NT = 2
 MAX_CPL = 42
+PROBA = 0.5
