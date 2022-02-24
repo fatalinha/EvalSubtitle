@@ -37,11 +37,11 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--output_dir', '-od', type=str, default=OUT_DIR_PATH,
-                        help="Path to save the degraded files")
+                        help="Path to save the degraded files.")
     parser.add_argument('--reference_file', '-ref', type=str, default=cst.AMARA_EN,
-                        help="The reference file against which to compute BLEU")
+                        help="The reference file against which to compute BLEU.")
     parser.add_argument('--results_file', '-res', type=str, required=True,
-                        help="csv file to write the metric scores")
+                        help="csv file to write the metric scores.")
 
     args = parser.parse_args()
     return args
@@ -56,13 +56,16 @@ def main(args):
         os.makedirs(out_dir_path)
 
     # Init dictionary to store metrics
-    eval_metrics = {"System": list(),
-                    "p_txt": list(), "p_tags": list(),
-                    "alpha": list(),
-                    "BLEU_nb": list(), "p1": list(), "p2": list(), "p3": list(), "p4": list(), "bp": list(),
-                    "BLEU_br": list(), "p'1": list(), "p'2": list(), "p'3": list(), "p'4": list(), "bp'": list(),
-                    "BLEU_br+": list(), "p'1+": list(), "p'2+": list(), "p'3+": list(), "p'4+": list(),
-                    "S": list()
+    eval_metrics = {cst.SYSTEM: list(),
+                    cst.P_TXT: list(), cst.P_TAGS: list(),
+                    cst.ALPHA: list(),
+                    cst.BLEU_NB: list(),
+                    cst.P1: list(), cst.P2: list(), cst.P3: list(), cst.P4: list(), cst.BP: list(),
+                    cst.BLEU_BR: list(),
+                    cst.PP1: list(), cst.PP2: list(), cst.PP3: list(), cst.PP4: list(), cst.BPP: list(),
+                    cst.BLEU_BR_UB: list(),
+                    cst.PP1_UB: list(), cst.PP2_UB: list(), cst.PP3_UB: list(), cst.PP4_UB: list(),
+                    cst.SIGMA: list()
                     }
 
     for p_txt in range(0, 100, 10):
@@ -99,28 +102,28 @@ def main(args):
 
             s = bleu_br / bleu_br_ub
 
-            eval_metrics["System"].append(system)
-            eval_metrics["p_txt"].append(p_txt)
-            eval_metrics["p_tags"].append(p_tags)
-            eval_metrics["alpha"].append(alpha)
-            eval_metrics["BLEU_nb"].append(bleu_nb)
-            eval_metrics["p1"].append(p1)
-            eval_metrics["p2"].append(p2)
-            eval_metrics["p3"].append(p3)
-            eval_metrics["p4"].append(p4)
-            eval_metrics["bp"].append(bp)
-            eval_metrics["BLEU_br"].append(bleu_br)
-            eval_metrics["p'1"].append(pp1)
-            eval_metrics["p'2"].append(pp2)
-            eval_metrics["p'3"].append(pp3)
-            eval_metrics["p'4"].append(pp4)
-            eval_metrics["bp'"].append(bpp)
-            eval_metrics["BLEU_br+"].append(bleu_br_ub)
-            eval_metrics["p'1+"].append(pp1_ub)
-            eval_metrics["p'2+"].append(pp2_ub)
-            eval_metrics["p'3+"].append(pp3_ub)
-            eval_metrics["p'4+"].append(pp4_ub)
-            eval_metrics["S"].append(s)
+            eval_metrics[cst.SYSTEM].append(system)
+            eval_metrics[cst.P_TXT].append(p_txt)
+            eval_metrics[cst.P_TAGS].append(p_tags)
+            eval_metrics[cst.ALPHA].append(alpha)
+            eval_metrics[cst.BLEU_NB].append(bleu_nb)
+            eval_metrics[cst.P1].append(p1)
+            eval_metrics[cst.P2].append(p2)
+            eval_metrics[cst.P3].append(p3)
+            eval_metrics[cst.P4].append(p4)
+            eval_metrics[cst.BP].append(bp)
+            eval_metrics[cst.BLEU_BR].append(bleu_br)
+            eval_metrics[cst.PP1].append(pp1)
+            eval_metrics[cst.PP2].append(pp2)
+            eval_metrics[cst.PP3].append(pp3)
+            eval_metrics[cst.PP4].append(pp4)
+            eval_metrics[cst.BPP].append(bpp)
+            eval_metrics[cst.BLEU_BR_UB].append(bleu_br_ub)
+            eval_metrics[cst.PP1_UB].append(pp1_ub)
+            eval_metrics[cst.PP2_UB].append(pp2_ub)
+            eval_metrics[cst.PP3_UB].append(pp3_ub)
+            eval_metrics[cst.PP4_UB].append(pp4_ub)
+            eval_metrics[cst.SIGMA].append(s)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)
@@ -129,10 +132,10 @@ def main(args):
         df.to_csv(out, index=False, header=True)
 
     # plot Sigma
-    s_plot = pd.DataFrame(eval_metrics["S"], index=df['System'])
+    s_plot = pd.DataFrame(eval_metrics["S"], index=df[cst.SYSTEM])
     s_plot.plot(kind="bar")
-    plt.xlabel("System")
-    plt.ylabel("Sigma")
+    plt.xlabel(cst.SYSTEM)
+    plt.ylabel(cst.SIGMA)
     plt.show()
 
 
