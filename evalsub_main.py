@@ -53,8 +53,8 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
         sigma_score = sigma_process(ref_file_path, sys_file_path, srt=srt)
-        bleu_br = sigma_score[cst.BLEU_BR]
-        bleu_nb = sigma_score[cst.BLEU_NB]
+        bleu_br = sigma_score[cst.BLEU_BR].score
+        bleu_nb = sigma_score[cst.BLEU_NB].score
         alpha = sigma_score[cst.ALPHA]
         sigma = sigma_score[cst.SIGMA]
         if cst.BLEU_BR in results:
@@ -148,8 +148,8 @@ def main(args):
 
     print('Computing the following metrics:', ', '.join(metrics))
 
-    results = {metric: list() for metric in metrics}
-    results[cst.SYSTEM] = list()
+    results = {cst.SYSTEM: list()}
+    results.update([(metric, list()) for metric in metrics])
     # Window size is saved if Pk or WindowDiff is computed
     if cst.PK in results or cst.WIN_DIFF in results:
         results[cst.WIN_SIZE] = list()
