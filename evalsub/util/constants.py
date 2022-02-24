@@ -23,6 +23,7 @@ NMT_FR = os.path.join(DATA_DIR_PATH, 'nmt.fr')
 
 CAPTION_TAG = '<eob>'
 LINE_TAG = '<eol>'
+NEUTRAL_TAG = '<eox>'
 LINE_HOLDER = 'µ'
 CAPTION_HOLDER = '§'
 MASK_CHAR = '#'

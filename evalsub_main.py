@@ -19,7 +19,7 @@ import os.path
 import pandas as pd
 
 from evalsub.eval.seg_eval import seg_process
-from evalsub.eval.f1_eval import evaluate_f1
+from evalsub.eval.f1_eval import f1_process
 from evalsub.eval.cpl_eval import cpl_process
 from evalsub.eval.ter_eval import ter_process
 from evalsub.eval.sigma_eval import sigma_process
@@ -67,12 +67,12 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
             results[cst.SIGMA].append(sigma)
 
     if cst.TER_BR in results:
-        ter_br = ter_process(ref_file_path, sys_file_path).score
+        ter_br = ter_process(ref_file_path, sys_file_path, srt=srt).score
         results[cst.TER_BR].append(ter_br)
 
     if cst.PRECISION in results or cst.RECALL in results or cst.F1 in results:
-        precision, recall, f1 = evaluate_f1(ref_file_path, sys_file_path, '<eox>', ttml=False, line_tag=cst.LINE_TAG,
-                                            caption_tag=cst.CAPTION_TAG)
+        precision, recall, f1 = f1_process(ref_file_path, sys_file_path, cst.NEUTRAL_TAG, srt=srt,
+                                           line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
         if cst.PRECISION in results:
             results[cst.PRECISION].append(precision)
         if cst.RECALL in results:
@@ -81,9 +81,11 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
             results[cst.F1].append(f1)
 
 
-def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, srt=False):
+def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
+                    srt=False):
+
     for sys_file_path in sys_file_paths:
-        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, srt=srt)
+        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, max_cpl=max_cpl, srt=srt)
 
 ## MAIN  #######################################################################
 
@@ -166,7 +168,7 @@ def main(args):
     nt = args.max_transpo
     max_cpl = args.max_cpl
 
-    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, srt=srt)
+    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, max_cpl=max_cpl, srt=srt)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)

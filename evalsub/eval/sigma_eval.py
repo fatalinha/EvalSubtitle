@@ -62,6 +62,8 @@ def sigma_process(ref_file_path, sys_file_path, srt=False):
     ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path, srt=srt)
     sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path, srt=srt)
 
+    assert len(sys_sents) == len(ref_sents)
+
     bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
     bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])
 

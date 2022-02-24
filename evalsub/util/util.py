@@ -19,8 +19,48 @@ toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
-from evalsub.util.srt import srt_to_tagged_sents
 import evalsub.util.constants as cst
+from evalsub.util.srt import srt_to_tagged_sents, srt_to_tagged_str
+from evalsub.util.ttml import ttml_to_tagged_str
+
+
+def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
+    """
+    Get the segmentation masses from a segmented subtitle file.
+
+    :param file_path: segmented subtitle file (ttml or tagged text)
+    :param srt: wether file_path is in srt format
+    :param ttml: whether file_path is in ttml format
+    :param line_tag: end of line boundary tag
+    :param caption_tag: end of caption/block boundary tag
+    :return: segmentation masses (segeval.BoundaryFormat.mass format)
+    """
+    if ttml:
+        tagged_str, _ = ttml_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+    elif srt:
+        tagged_str, _ = srt_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+    else:
+        tagged_str = ' '.join([line.strip() for line in open(file_path).readlines()])
+
+    # Quick pre-processing before splitting
+    # Removing (potential) multiple spaces
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
+    # Removing spaces around boundaries
+    tagged_str = re.sub(r"( )?(%s|%s)( )?" % (line_tag, caption_tag), r"\2", tagged_str)
+    # Removing (potential) ending boundary
+    tagged_str = re.sub(r"%s$" % caption_tag, r"", tagged_str)
+
+    # <eob> only segmentation
+    eob_str = re.sub(line_tag, r" ", tagged_str)
+    eob_masses = [len(segment.split()) for segment in eob_str.split(caption_tag)]
+    # <eol> only segmentation
+    eol_str = re.sub(caption_tag, r" ", tagged_str)
+    eol_masses = [len(segment.split()) for segment in eol_str.split(line_tag)]
+    # <eox> (<eol> = <eob>) segmentation
+    eox_str = re.sub(caption_tag, line_tag, tagged_str)
+    eox_masses = [len(segment.split()) for segment in eox_str.split(line_tag)]
+
+    return eob_masses, eol_masses, eox_masses
 
 
 def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,

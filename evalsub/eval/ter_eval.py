@@ -29,22 +29,22 @@ import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
 
 
-def ter_preprocess(infile, remove_eol=False, remove_eob=False, replace=False):
-    tagged_txt = preprocess(infile, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-                            caption_holder=cst.CAPTION_HOLDER)
+def ter_preprocess(infile, remove_eol=False, remove_eob=False, replace=False, srt=False):
+    tagged_str = preprocess(infile, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
+                            caption_holder=cst.CAPTION_HOLDER, srt=srt)
     if remove_eol:
-        tagged_txt = re.sub(cst.LINE_HOLDER, r" ", tagged_txt)
+        tagged_str = re.sub(cst.LINE_HOLDER, r" ", tagged_str)
     if remove_eob:
-        tagged_txt = re.sub(cst.CAPTION_HOLDER, r" ", tagged_txt)
+        tagged_str = re.sub(cst.CAPTION_HOLDER, r" ", tagged_str)
     if replace:
-        tagged_txt = re.sub(cst.LINE_HOLDER, cst.CAPTION_HOLDER, tagged_txt)
+        tagged_str = re.sub(cst.LINE_HOLDER, cst.CAPTION_HOLDER, tagged_str)
 
-    # Inserting spaces besides boundaries
-    tagged_txt = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_txt)
+    # Inserting spaces around boundaries
+    tagged_str = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_str)
     # Removing potential multiple spaces
-    tagged_txt = re.sub(r" {2,}", r" ", tagged_txt)
+    tagged_str = re.sub(r" {2,}", r" ", tagged_str)
 
-    tagged_sents = tagged_txt.splitlines()
+    tagged_sents = tagged_str.splitlines()
     tagged_sents = [tagged_sent.strip() for tagged_sent in tagged_sents]
     masked_sents = [re.sub(r"[^ %s%s]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), cst.MASK_CHAR, tagged_sent) for tagged_sent in tagged_sents]
 
@@ -60,13 +60,15 @@ def calculate_ter(sys, ref):
     return ter_score, signature
 
 
-def ter_process(reference_file, system_file, extra=False):
+def ter_process(reference_file, system_file, srt=False, extra=False):
     ter = TER()
 
-    ref = ter_preprocess(reference_file)
-    sys = ter_preprocess(system_file)
+    ref_sents = ter_preprocess(reference_file, srt=srt)
+    sys_sents = ter_preprocess(system_file, srt=srt)
 
-    ter_score = ter.corpus_score(sys, [ref])
+    assert len(sys_sents) == len(ref_sents)
+
+    ter_score = ter.corpus_score(sys_sents, [ref_sents])
     signature = ter.get_signature()
 
     if extra:
