@@ -20,8 +20,8 @@ if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
-from evalsub.util.srt import srt_to_tagged_sents, srt_to_tagged_str
-from evalsub.util.ttml import ttml_to_tagged_str
+import evalsub.util.srt as utl_srt
+import evalsub.util.ttml as utl_ttml
 
 
 def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
@@ -36,9 +36,9 @@ def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_
     :return: segmentation masses (segeval.BoundaryFormat.mass format)
     """
     if ttml:
-        tagged_str, _ = ttml_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+        tagged_str, _ = utl_ttml.ttml_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
     elif srt:
-        tagged_str, _ = srt_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
+        tagged_str, _ = utl_srt.srt_to_tagged_str(file_path, line_tag=line_tag, caption_tag=caption_tag)
     else:
         tagged_str = ' '.join([line.strip() for line in open(file_path).readlines()])
 
@@ -102,7 +102,7 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
     :return: Preprocessed string
     """
     if srt:
-        tagged_sents, _ = srt_to_tagged_sents(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
+        tagged_sents, _ = utl_srt.srt_to_tagged_sents(input_file_path, line_tag=line_tag, caption_tag=caption_tag)
         tagged_str = '\n'.join(tagged_sents)
     else:
         tagged_str = open(input_file_path).read()

@@ -11,10 +11,17 @@
 # limitations under the License
 
 import argparse
+import os
 import re
+import sys
 
-import constants as cst
-from .util import write_lines
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
+
+import evalsub.util.constants as cst
+import evalsub.util.util as utl
 
 
 def hms_to_hmsf(hms):
@@ -172,9 +179,9 @@ def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, l
     tagged_sents, time_spans = srt_to_tagged_sents(srt_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
     print('Writing...')
-    write_lines(tagged_sents, tagged_txt_file_path)
+    utl.write_lines(tagged_sents, tagged_txt_file_path)
     if timecode_file_path is not None:
-        write_lines(time_spans, timecode_file_path)
+        utl.write_lines(time_spans, timecode_file_path)
 
 
 def tagged_txt_to_srt(srt_file_path, tagged_txt_file_path, timecode_file_path):

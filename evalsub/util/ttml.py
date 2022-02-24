@@ -16,15 +16,22 @@ import hashlib
 import math
 import os
 import re
+import sys
 import xml.etree.ElementTree as ET
 
 try:
     import textstat
     FRE = True
 except ImportError:
+    textstat = None
     FRE = False
 
-from .util import write_lines
+# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if toplevel_path not in sys.path:
+    sys.path.insert(1, toplevel_path)
+
+import evalsub.util.util as utl
 
 
 COLOR_FILTER = frozenset(['magenta', 'red'])
@@ -464,7 +471,7 @@ def read_sub(ttml_file_path, text_file_path, filtering=True, masking=False):
         start_pos = end_pos + 1  # + 1 accounts for the space
     
     print('Writing...')
-    write_lines(sub_segments, text_file_path)
+    utl.write_lines(sub_segments, text_file_path)
 
 
 def ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path, filtering=True, masking=False,
@@ -486,9 +493,9 @@ def ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path,
         start_pos = end_pos
 
     print('Writing...')
-    write_lines(sub_segments, tagged_txt_file_path)
+    utl.write_lines(sub_segments, tagged_txt_file_path)
     if timecode_file_path is not None:
-        write_lines(time_spans, timecode_file_path)
+        utl.write_lines(time_spans, timecode_file_path)
 
 
 def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
