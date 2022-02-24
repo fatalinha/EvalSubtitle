@@ -37,9 +37,9 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         if cst.WIN_SIZE in results:
             results[cst.WIN_SIZE].append(win_size)
         if cst.PK in results:
-            results[cst.PK].append(round(pk, 3))
+            results[cst.PK].append(pk)
         if cst.WIN_DIFF in results:
-            results[cst.WIN_DIFF].append(round(win_diff, 3))
+            results[cst.WIN_DIFF].append(win_diff)
         if cst.NT in results:
             results[cst.NT].append(nt)
         if cst.SEG_SIM in results:
