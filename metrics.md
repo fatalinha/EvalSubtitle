@@ -67,6 +67,9 @@ TER calculated with all tokens of the sentence masked.
 
 Subtitle BLEU. Calculates BLEU on subtitles instead of sentences, so that any target words that appear in the wrong subtitle count as error. Assumes that the subtitles in the target and the reference match.
 
+### Conformity to the subtitle constraint of length (CPL_conf)
+Subtitles should not exceed a specific length. Conformity is measured as a maximum subtitle length of _n_ characters per line (maximum 2 lines of up to _n_ characters each for the subtitle block), where _n_ is 42 according to TED subtitling guidelines. CPL_conformity is the percentage of subtitles in the corpus conforming to the length constraint.
+
 # Adapting standard metrics via alignment
 
 MWER (Matusov et al., 2006)
