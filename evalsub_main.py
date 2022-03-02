@@ -10,12 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
+DESCRIPTION = """ Run EvalSub tool to compute segmentation metrics
 """
 
 import argparse
 import os.path
-
 import pandas as pd
 
 from evalsub.eval.seg_eval import seg_process
@@ -30,6 +29,7 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
                    srt=False):
 
     results[cst.SYSTEM].append(os.path.basename(sys_file_path))
+    print("Evaluating " + sys_file_path)
 
     if cst.PK in results or cst.WIN_DIFF in results or cst.SEG_SIM in results or cst.BOUND_SIM in results:
         win_size, pk, win_diff, seg_sim, bound_sim = seg_process(sys_file_path, ref_file_path, srt=srt,
@@ -38,18 +38,23 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
             results[cst.WIN_SIZE].append(win_size)
         if cst.PK in results:
             results[cst.PK].append(pk)
+            print('Pk: ' + str(round(pk, 3)))
         if cst.WIN_DIFF in results:
             results[cst.WIN_DIFF].append(win_diff)
+            print('WindowDiff: ' + str(round(win_diff, 3)))
         if cst.NT in results:
             results[cst.NT].append(nt)
         if cst.SEG_SIM in results:
             results[cst.SEG_SIM].append(seg_sim)
+            print('Segmentation similarity: ' + str(round(seg_sim, 3)))
         if cst.BOUND_SIM in results:
             results[cst.BOUND_SIM].append(bound_sim)
+            print('Boundary similarity: ' + str(round(bound_sim, 3)))
 
     if cst.CPL_CONF in results:
         cpl_conf = cpl_process(sys_file_path, max_cpl=max_cpl, srt=srt)
         results[cst.CPL_CONF].append(cpl_conf)
+        print("CPL conformity: " + str(round(cpl_conf, 2)) + '%')
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
         sigma_score = sigma_process(ref_file_path, sys_file_path, srt=srt)
@@ -59,26 +64,33 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         sigma = sigma_score[cst.SIGMA]
         if cst.BLEU_BR in results:
             results[cst.BLEU_BR].append(bleu_br)
+            print('BLEU_br: ' + str(round(bleu_br, 2)))
         if cst.BLEU_NB in results:
             results[cst.BLEU_NB].append(bleu_nb)
+            print('BLEU_nb: ' + str(bleu_nb))
         if cst.ALPHA in results:
             results[cst.ALPHA].append(alpha)
         if cst.SIGMA in results:
             results[cst.SIGMA].append(sigma)
+            print('Sigma: ' + str(round(sigma, 2)))
 
     if cst.TER_BR in results:
         ter_br = ter_process(ref_file_path, sys_file_path, srt=srt).score
         results[cst.TER_BR].append(ter_br)
+        print('TER_br: ' + str(round(ter_br, 2)))
 
     if cst.PRECISION in results or cst.RECALL in results or cst.F1 in results:
         precision, recall, f1 = f1_process(ref_file_path, sys_file_path, cst.NEUTRAL_TAG, srt=srt,
                                            line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG)
         if cst.PRECISION in results:
             results[cst.PRECISION].append(precision)
+            print('Precision: ' + str(round(precision, 3)))
         if cst.RECALL in results:
             results[cst.RECALL].append(recall)
+            print('Recall: ' + str(round(recall, 3)))
         if cst.F1 in results:
             results[cst.F1].append(f1)
+            print('F1: ' + str(round(f1, 3)))
 
 
 def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
@@ -112,7 +124,7 @@ def parse_args():
                         help="CSV file where to write the results.")
 
     parser.add_argument('--srt', '-srt', action='store_true',
-                        help="Wether the subtitle files are in srt format.")
+                        help="Whether the subtitle files are in srt format.")
 
     parser.add_argument('--window_size', '-k', type=int,
                         help="Window size for the window-based segmentation evaluation.")

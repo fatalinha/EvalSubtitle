@@ -51,9 +51,9 @@ def cpl_process(sys_file_path, max_cpl=cst.MAX_CPL, srt=False, line_tag=cst.LINE
     n_conforming_cpls = sum([cpl <= max_cpl for cpl in cpls])
     cpl_conformity = -1
     try:
-        cpl_conformity = n_conforming_cpls / n_cpls
-        print('Length conformity: %.2f %% (%d/%d)' % (100 * cpl_conformity, n_conforming_cpls, n_cpls))
-        print('Mean line length: %2.f Stdev: %2.f' % (statistics.mean(cpls), statistics.stdev(cpls)))
+        cpl_conformity = 100 * (n_conforming_cpls / n_cpls)
+        # print('Length conformity: %.2f %% (%d/%d)' % (100 * cpl_conformity, n_conforming_cpls, n_cpls))
+        # print('Mean line length: %2.f Stdev: %2.f' % (statistics.mean(cpls), statistics.stdev(cpls)))
     except (ZeroDivisionError, statistics.StatisticsError):
         pass
 

@@ -289,7 +289,7 @@ def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_
     for eob_pos in eob_to_add:
         tagged_txt = replace_char(tagged_txt, eob_pos, cst.CAPTION_HOLDER)
 
-    print('Writing...')
+    print('Writing ' + output_file_path)
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
     n_eol += n_eol_additions

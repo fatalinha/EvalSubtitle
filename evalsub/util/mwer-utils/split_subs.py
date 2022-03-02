@@ -17,7 +17,8 @@ caption_tag = '<eob>'
 
 
 def deescape_special_chars(sent):
-    sent = sent.replace('&lt; ','<').replace(' &gt;','>').replace('&quot;','"').replace('&apos;', "'").replace('&amp;','&').replace('&bar;', '|')
+    sent = sent.replace('&lt; ','<').replace(' &gt;','>').replace('&quot;','"')\
+        .replace('&apos;', "'").replace('&amp;','&').replace('&bar;', '|')
     return sent
 
 

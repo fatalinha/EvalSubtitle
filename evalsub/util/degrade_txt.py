@@ -64,7 +64,7 @@ def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=cst.L
     # Inserting spaces besides masked chars
     tagged_txt = re.sub(cst.MASK_CHAR, r" %s " % cst.MASK_CHAR, tagged_txt)
 
-    print('Writing...')
+    print('Writing ' + output_file_path)
     postprocess(tagged_txt, output_file_path, line_tag=line_tag, caption_tag=caption_tag)
 
     n_words += n_word_additions

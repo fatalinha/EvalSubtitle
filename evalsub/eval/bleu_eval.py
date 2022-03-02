@@ -17,7 +17,6 @@ Computes BLEU and the difference between BLEU with and without breaks
 import os
 import re
 import sys
-
 from sacrebleu.metrics import BLEU
 
 # We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
@@ -97,5 +96,5 @@ def bleu_process(reference_file, system_file, extra=False, no_break=False):
         print('BLEU only eob:', score_eob)
         print('BLEU difference without-with:', bleu_diff)
 
-    print(signature)
+
     return bleu_score

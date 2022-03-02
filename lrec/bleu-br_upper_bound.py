@@ -29,7 +29,6 @@ import evalsub.util.constants as cst
 from evalsub.util.degrade_tags import mixed as mixed_tags
 from evalsub.util.degrade_txt import mixed as mixed_txt
 
-
 OUT_DIR_PATH = 'mixed'
 
 
