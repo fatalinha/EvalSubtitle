@@ -4,9 +4,9 @@ This repository contains EvalSubtitle, a tool for reference-based evaluation of 
 
 EvalSub computes standard segmentation metrics (F1, WindowDiff etc.) as well as tailored subtitling segmentation metrics (Sigma) by comparing the segmentation in an output file and a reference file (segmentation done by humans).
 It supports evaluation of segmentation both for perfect and imperfect textual content (with respect to the reference).  
-For example, end-to-end translation and transcription systems predict segmentation along with the text, which may be erroneous or different from the reference text. 
-When the text of the output file corresponds 100% to the text in the reference (perfect texts), EvalSub computes standard segmentation metrics on the given text.
-For imperfect texts (the text of the output file is changed compared to the reference), a boundary projection algorithm is used to project the output boundaries to the reference. Standard metrics are then computed on the projected file. 
+For example, end-to-end translation and transcription systems predict segmentation along with the text, which may be erroneous or not identical from the reference text. 
+When the text of the output file is identical to the text in the reference (perfect texts), EvalSub computes standard segmentation metrics on the given text.
+For imperfect texts (output text not identical to reference text), a boundary projection algorithm is used to project the output boundaries to the reference. Standard metrics are then computed on the projected file. 
 
 The repository also contains the Subtitle Segmentation Score (Sigma), specifically tailored for evaluating segmentation from imperfect texts.
 More details can be found in the paper.
