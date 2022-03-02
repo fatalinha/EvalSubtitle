@@ -1,9 +1,6 @@
 # EvalSubtitle
 
 This repository contains EvalSubtitle, a tool for reference-based evaluation of subtitle segmentation.
-Subtitle segmentation refers to how a string of text is split across subtitles.
-Usually text needs to be segmented based on specific constraints. For example, a subtitle line should not exceed a specific length in characters and should be split in a way that respects linguistic units.
-There are two types of subtitle boundaries, \<eob> which marks the end of a subtitle block (the next subtitle appears on a new screen) and \<eol> which inserts a new line inside the subtitle block.
 
 EvalSub computes standard segmentation metrics (F1, WindowDiff etc.) as well as tailored subtitling segmentation metrics (Sigma) by comparing the segmentation in an output file and a reference file (segmentation done by humans).
 It supports evaluation of segmentation both for perfect and imperfect textual content (with respect to the reference).  
@@ -11,7 +8,7 @@ For example, end-to-end translation and transcription systems predict segmentati
 When the text of the output file corresponds 100% to the text in the reference (perfect texts), EvalSub computes standard segmentation metrics on the given text.
 For imperfect texts (the text of the output file is changed compared to the reference), a boundary projection algorithm is used to project the output boundaries to the reference. Standard metrics are then computed on the projected file. 
 
-The repository contains the Subtitle Segmentation Score (Sigma), specifically tailored for evaluating segmentation from imperfect texts.
+The repository also contains the Subtitle Segmentation Score (Sigma), specifically tailored for evaluating segmentation from imperfect texts.
 More details can be found in the paper.
 
 
