@@ -73,6 +73,7 @@ Compute only Sigma, BLEU_br and BLEU_nb, for the automatic subtitles in data:
 ### Citation
 If you use EvalSubtitle in your research, please cite the following paper:
 
+Alina Karakanta, François Buet, Mauro Cettolo and François Yvon. (2022). Evaluating Subtitle Segmentation for End-to-end Generation Systems. In _Proceedings of LREC 2022_. 
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].

@@ -96,5 +96,4 @@ def bleu_process(reference_file, system_file, extra=False, no_break=False):
         print('BLEU only eob:', score_eob)
         print('BLEU difference without-with:', bleu_diff)
 
-
     return bleu_score

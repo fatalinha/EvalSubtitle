@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+""" Script to replicate Experiment 2 from the LREC paper
+ Evaluating Subtitle Segmentation for End-to-end Generation Systems. """
 
 import argparse
 from math import exp, log
