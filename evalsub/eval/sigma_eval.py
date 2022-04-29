@@ -33,14 +33,14 @@ def sigma_preprocess(file_path, srt=False):
     tagged_str = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
                             caption_holder=cst.CAPTION_HOLDER, srt=srt)
     n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
+    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
+
+    alpha = n_boundaries / n_words
 
     # Removing boundaries
     string = re.sub(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" ", tagged_str)
     # Removing potential multiple spaces
     string = re.sub(r" {2,}", r" ", string)
-    # Tokenize the string to get number of word tokens
-    tok_string = tokenizer(string)
-    n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tok_string)))
 
     sents = string.splitlines()
     sents = [sent.strip() for sent in sents]
@@ -54,9 +54,6 @@ def sigma_preprocess(file_path, srt=False):
     tagged_sents = [tagged_sent.strip() for tagged_sent in tagged_sents]
 
     assert len(sents) == len(tagged_sents)
-
-    # Computing alpha
-    alpha = n_boundaries / n_words
 
     return alpha, sents, tagged_sents
 
