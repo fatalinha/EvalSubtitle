@@ -45,7 +45,7 @@ def sigma_preprocess(file_path, srt=False):
     sents = string.splitlines()
     sents = [sent.strip() for sent in sents]
 
-    # Inserting spaces besides boundaries
+    # Inserting spaces around boundaries
     tagged_str = re.sub(r"(%s|%s)" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), r" \1 ", tagged_str)
     # Removing potential multiple spaces
     tagged_str = re.sub(r" {2,}", r" ", tagged_str)

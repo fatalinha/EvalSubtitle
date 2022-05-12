@@ -107,13 +107,18 @@ def parse_args():
     parser.add_argument('--all', '-a', action='store_true',
                         help="Compute all metrics.")
     parser.add_argument('--standard', '-std', action='store_true',
-                        help="Compute all metrics that require identical text.")
+                        help="Compute all metrics that require identical/perfect text.")
     parser.add_argument('--end2end', '-e2e', action='store_true',
-                        help="Compute all metrics that do not require identical text.")
+                        help="Compute all metrics that do not require identical/perfect text.")
     parser.add_argument('--include', '-i', type=str, nargs='+',
-                        help="Compute only these metrics.")
+                        help="Compute only the specified metrics.")
     parser.add_argument('--exclude', '-e', type=str, nargs='+',
-                        help="Compute all but these metrics.")
+                        help="Compute all but the specified metrics.")
+    parser.add_argument('--text', '-t', type=str, choices=['perfect', 'imperfect'],
+                        help="Wether the text from system subtitles is identical "
+                             "to the text from reference subtitles (perfect), or not (imperfect). "
+                             "(Can be used as a safeguard to prevent computing standard metrics "
+                             "with imperfect text)")
 
     parser.add_argument('--system_files', '-sys', type=str, nargs='+',
                         default=[cst.CASCADE_FR, cst.E2E_BASE_FR, cst.E2E_PT_FR, cst.NMT_FR],
@@ -143,6 +148,7 @@ def main(args):
     end2end_metrics = args.end2end
     included_metrics = args.include
     excluded_metrics = args.exclude
+    text = args.text
     if not all_metrics and not standard_metrics and not end2end_metrics and included_metrics is None and excluded_metrics is None:
         metrics = cst.DEFAULT_METRICS
     else:
@@ -157,6 +163,9 @@ def main(args):
             metrics.intersection_update(included_metrics)
         if excluded_metrics is not None:
             metrics.difference_update(excluded_metrics)
+
+    if text == 'imperfect':
+        metrics.difference_update(cst.STD_METRICS)
 
     print('Computing the following metrics:', ', '.join(metrics))
 
