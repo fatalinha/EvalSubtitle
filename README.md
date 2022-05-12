@@ -45,10 +45,11 @@ System and reference srt files should contain the same number of sentences for t
 ### Parameters
 
 * --all, -a: Compute all metrics.
-* --standard, -std: Compute all metrics that require identical text.
-* --end2end, -e2e: Compute all metrics that do not require identical text.
+* --standard, -std: Compute all metrics that require identical/perfect text.
+* --end2end, -e2e: Compute all metrics that do not require identical/perfect text.
 * --include, -i: Compute only the specified metrics.
 * --exclude, -e: Compute all but the specified metrics.
+* --text, -t: Wether the text from system subtitles is identical to the text from reference subtitles ("perfect"), or not ("imperfect"). (Can be used as a safeguard to prevent computing standard metrics with imperfect text)
 * --system_files, -sys: Segmented subtitle files to evaluate (by default, the system files in data).
 * --reference_file, -ref: Reference segmented subtitle file (by default, the reference file in data).
 * --results_file, -res: CSV file where to write the results.
@@ -69,6 +70,9 @@ Compute only Sigma, BLEU_br and BLEU_nb, for the automatic subtitles in data:
 
 `python evalsub_main.py -res results.csv -i Sigma BLEU_br BLEU_nb`
 
+Compute all metrics that are compatible with imperfect text:
+
+`python evalsub_main.py -res results.csv -a -t imperfect`, also equivalent to `python evalsub_main.py -res results.csv -e2e`
 
 ### Citation
 If you use EvalSubtitle in your research, please cite the following paper:
