@@ -1,14 +1,11 @@
 # EvalSubtitle
 
-This repository contains EvalSubtitle, a tool for reference-based evaluation of subtitle segmentation.
+EvalSubtitle is a tool for reference-based evaluation of subtitle segmentation.
 
-EvalSub computes standard segmentation metrics (F1, WindowDiff etc.) as well as tailored subtitling segmentation metrics (Sigma) by comparing the segmentation in an output file and a reference file (segmentation done by humans).
-It supports evaluation of segmentation both for perfect and imperfect textual content (with respect to the reference).  
-For example, end-to-end translation and transcription systems predict segmentation along with the text, which may be erroneous or not identical from the reference text. 
-When the text of the output file is identical to the text in the reference (perfect texts), EvalSub computes standard segmentation metrics on the given text.
-For imperfect texts (output text not identical to reference text), a boundary projection algorithm is used to project the output boundaries to the reference. Standard metrics are then computed on the projected file. 
+The repository contains the Subtitle Segmentation Score (Sigma), specifically tailored for evaluating segmentation from system outputs where the text is not identical to a reference (imperfect texts).
+EvalSub also contains a collection of standard segmentation metrics (F1, WindowDiff etc.) as well as subtitling evaluation metrics: BLEU on segmented (BLEU_br) and non-segmented text (BLEU_nb), and TER_br.
 
-The repository also contains the Subtitle Segmentation Score (Sigma), specifically tailored for evaluating segmentation from imperfect texts.
+
 More details can be found in the paper.
 
 
@@ -20,6 +17,8 @@ python>=3.6.0
 ### Metrics
 
 The script evalsub_main.py allows the computation of the following metrics:
+
+Standard segmentation metrics:
 * Precision
 * Recall
 * F1
@@ -27,6 +26,8 @@ The script evalsub_main.py allows the computation of the following metrics:
 * WinDiff (WindowDiff)
 * SegSim (Segmentation Similarity)
 * BoundSim (Boundary Similarity)
+
+Subtitling evaluation metrics
 * BLEU_br
 * BLEU_nb
 * TER_br
@@ -49,7 +50,7 @@ System and reference srt files should contain the same number of sentences for t
 * --end2end, -e2e: Compute all metrics that do not require identical/perfect text.
 * --include, -i: Compute only the specified metrics.
 * --exclude, -e: Compute all but the specified metrics.
-* --text, -t: Wether the text from system subtitles is identical to the text from reference subtitles ("perfect"), or not ("imperfect"). (Can be used as a safeguard to prevent computing standard metrics with imperfect text)
+* --text, -t: Whether the text from system subtitles is identical to the text from reference subtitles ("perfect"), or not ("imperfect"). (Can be used as a safeguard to prevent computing standard metrics with imperfect text)
 * --system_files, -sys: Segmented subtitle files to evaluate (by default, the system files in data).
 * --reference_file, -ref: Reference segmented subtitle file (by default, the reference file in data).
 * --results_file, -res: CSV file where to write the results.
