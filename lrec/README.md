@@ -18,7 +18,7 @@ First get the required MWER Segmenter
 
 Run the boundary projection method
 ```
-bash bound_proj.sh $(dirname $0)/../data/nmt.fr $(dirname $0)/../amara.fr nmt fr
+bash bound_proj.sh $(dirname $0)/../data/nmt.fr $(dirname $0)/../data/amara.fr nmt fr
 ```
 
 
