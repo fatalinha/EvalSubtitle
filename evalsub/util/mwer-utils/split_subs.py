@@ -14,8 +14,6 @@
 import sys
 from os.path import join
 import re
-from sacrebleu.tokenizers import tokenizer_13a
-tokenizer = tokenizer_13a.Tokenizer13a()
 
 
 infile = sys.argv[1]
@@ -31,8 +29,7 @@ with open(infile) as inf:
     for e, line in enumerate(inf):
         outfile = join(outdir, str(e).zfill(4) + '.' + suffix)
         # Tokenize and restore boundaries
-        text = tokenizer(line).replace('< ', '<').replace(' >', '>')
-        print(text)
+        text = line.replace('< ', '<').replace(' >', '>')
         # Split sentences at subtitle boundaries
         text = text.rstrip().replace(line_tag, '\n').replace(caption_tag, '\n')
         # Removing spaces besides boundaries
