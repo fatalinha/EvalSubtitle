@@ -26,7 +26,7 @@ import evalsub.util.constants as cst
 
 
 def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
-                   srt=False):
+                   srt=False, confidence_interval=False):
 
     results[cst.SYSTEM].append(os.path.basename(sys_file_path))
     print("Evaluating " + sys_file_path)
@@ -57,22 +57,23 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         print("CPL conformity: " + str(round(cpl_conf, 2)) + '%')
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
-        sigma_score = sigma_process(ref_file_path, sys_file_path, srt=srt)
-        bleu_br = sigma_score[cst.BLEU_BR].score
-        bleu_nb = sigma_score[cst.BLEU_NB].score
+        sigma_score = sigma_process(
+            ref_file_path, sys_file_path, srt=srt, confidence_interval=confidence_interval)
+        bleu_br = sigma_score[cst.BLEU_BR]
+        bleu_nb = sigma_score[cst.BLEU_NB]
         alpha = sigma_score[cst.ALPHA]
         sigma = sigma_score[cst.SIGMA]
         if cst.BLEU_BR in results:
-            results[cst.BLEU_BR].append(bleu_br)
-            print('BLEU_br: ' + str(round(bleu_br, 2)))
+            results[cst.BLEU_BR].append(bleu_br.score)
+            print('BLEU_br: ' + bleu_br.format(score_only=True))
         if cst.BLEU_NB in results:
-            results[cst.BLEU_NB].append(bleu_nb)
-            print('BLEU_nb: ' + str(bleu_nb))
+            results[cst.BLEU_NB].append(bleu_nb.score)
+            print('BLEU_nb: ' + bleu_nb.format(score_only=True))
         if cst.ALPHA in results:
             results[cst.ALPHA].append(alpha)
         if cst.SIGMA in results:
-            results[cst.SIGMA].append(sigma)
-            print('Sigma: ' + str(round(sigma, 2)))
+            results[cst.SIGMA].append(sigma.score)
+            print('Sigma: ' + sigma.format(score_only=True))
 
     if cst.TER_BR in results:
         ter_br = ter_process(ref_file_path, sys_file_path, srt=srt).score
@@ -94,10 +95,12 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
 
 
 def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
-                    srt=False):
+                    srt=False, confidence_interval=False):
 
     for sys_file_path in sys_file_paths:
-        run_evaluation(ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, max_cpl=max_cpl, srt=srt)
+        run_evaluation(
+            ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, max_cpl=max_cpl,
+            srt=srt, confidence_interval=confidence_interval)
 
 ## MAIN  #######################################################################
 
@@ -137,6 +140,10 @@ def parse_args():
                         help="Maximum distance that can accounted as a transposition.")
     parser.add_argument('--max_cpl', '-cpl', type=int, default=cst.MAX_CPL,
                         help="Maximum allowed length for subtitle lines.")
+    parser.add_argument('--confidence_interval', '-ci', action='store_true', default=False,
+                        help="If set, compute (and print) the confidence interval (CI) for BLEU "
+                             "and Sigma. The CI is computed using bootstrap resampling (with 95% "
+                             "confidence).")
 
     args = parser.parse_args()
     return args
@@ -185,11 +192,14 @@ def main(args):
     ref_file_path = args.reference_file
     res_file_path = args.results_file
     srt = args.srt
+    confidence_interval = args.confidence_interval
     window_size = args.window_size
     nt = args.max_transpo
     max_cpl = args.max_cpl
 
-    run_evaluations(ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, max_cpl=max_cpl, srt=srt)
+    run_evaluations(
+        ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, max_cpl=max_cpl,
+        srt=srt, confidence_interval=confidence_interval)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)

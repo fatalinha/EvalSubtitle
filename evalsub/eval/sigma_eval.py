@@ -16,7 +16,9 @@ import os
 import re
 import sys
 
+import numpy as np
 from sacrebleu.metrics import BLEU
+from sacrebleu.metrics.base import Score
 from sacrebleu.tokenizers import tokenizer_13a
 tokenizer = tokenizer_13a.Tokenizer13a()
 
@@ -58,18 +60,7 @@ def sigma_preprocess(file_path, srt=False):
     return alpha, sents, tagged_sents
 
 
-def sigma_process(ref_file_path, sys_file_path, srt=False):
-    bleu = BLEU()
-
-    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path, srt=srt)
-    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path, srt=srt)
-
-    assert len(sys_sents) == len(ref_sents)
-
-    bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
-    bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])
-
-    alpha = sys_alpha
+def sigma(alpha, bleu_nb_score, bleu_br_score):
     p1, p2, p3, p4 = bleu_nb_score.precisions
     bleu_br = bleu_br_score.score
     bpp = bleu_br_score.bp
@@ -80,19 +71,57 @@ def sigma_process(ref_file_path, sys_file_path, srt=False):
     pp4_ub = ((1 - 3 * alpha) * p4 + 4 * alpha * p3) / (1 + alpha)
     bleu_br_ub = bpp * exp((log(pp1_ub) + log(pp2_ub) + log(pp3_ub) + log(pp4_ub)) / 4)
 
-    sigma = 100 * bleu_br / bleu_br_ub
+    return Score("Sigma", 100 * bleu_br / bleu_br_ub)
 
-    sigma_score = { cst.SIGMA: sigma,
-                cst.ALPHA: alpha,
-                cst.BLEU_BR_UB: bleu_br_ub,
-                cst.PP1_UB: pp1_ub,
-                cst.PP2_UB: pp2_ub,
-                cst.PP3_UB: pp3_ub,
-                cst.PP4_UB: pp4_ub,
-                cst.BLEU_NB: bleu_nb_score,
-                cst.BLEU_BR: bleu_br_score}
 
-    return sigma_score
+def __bs_idxs(size, n_samples=1000):
+    """
+    Samples `n_samples` sets of size `size` for bootstrap resampling.
+    """
+    seed = int(os.environ.get('BOOTSTRAP_RESAMPLE_SEED', '12345'))
+    rng = np.random.default_rng(seed)
+    return rng.choice(size, size=(n_samples, size), replace=True)
+
+
+def sigma_process(ref_file_path, sys_file_path, srt=False, confidence_interval=False):
+    bleu = BLEU()
+
+    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path, srt=srt)
+    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path, srt=srt)
+
+    assert len(sys_sents) == len(ref_sents)
+
+    bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
+    bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])
+
+    sigma_score = sigma(sys_alpha, bleu_nb_score, bleu_br_score)
+
+    if confidence_interval:
+        bleu_nb_stats = bleu._extract_corpus_statistics(sys_sents, [ref_sents])
+        bleu_br_stats = bleu._extract_corpus_statistics(sys_tagged_sents, [ref_tagged_sents])
+        idxs = __bs_idxs(len(bleu_nb_stats))
+
+        # convert to numpy array. float32 is more efficient
+        bleu_nb_stats_np = np.array(bleu_nb_stats, dtype='float32')
+        bleu_br_stats_np = np.array(bleu_br_stats, dtype='float32')
+
+        # recompute scores for all resamples
+        bleu_nb_scores = [
+            bleu._compute_score_from_stats(_s.sum(0)) for _s in bleu_nb_stats_np[idxs]]
+        bleu_br_scores = [
+            bleu._compute_score_from_stats(_s.sum(0)) for _s in bleu_br_stats_np[idxs]]
+        sigma_scores = [
+            sigma(sys_alpha, _bleu_nb, _bleu_br)
+            for _bleu_nb, _bleu_br in zip(bleu_nb_scores, bleu_br_scores)]
+        bleu_nb_score.estimate_ci(bleu_nb_scores)
+        bleu_br_score.estimate_ci(bleu_br_scores)
+        sigma_score.estimate_ci(sigma_scores)
+
+    return {
+        cst.SIGMA: sigma_score,
+        cst.ALPHA: sys_alpha,
+        cst.BLEU_NB: bleu_nb_score,
+        cst.BLEU_BR: bleu_br_score}
 
 
 def parse_args():
