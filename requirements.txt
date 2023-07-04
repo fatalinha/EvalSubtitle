@@ -6,3 +6,4 @@ matplotlib~=3.3.4
 segeval~=2.0.11
 sacremoses~=0.0.46
 srt~=3.5.0
+numpy
