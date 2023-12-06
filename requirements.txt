@@ -2,7 +2,7 @@
 numpy
 pandas
 sacrebleu>=2.0.0
-segeval=2.0.11
+segeval==2.0.11
 # Additional requirements for LREC 2022 experiments replication scripts
 matplotlib
 sacremoses

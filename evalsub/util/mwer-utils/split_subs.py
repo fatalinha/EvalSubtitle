@@ -11,9 +11,10 @@
 # limitations under the License
 
 """ Split file by subtitle blocks, one block per line """
-import sys
+
 from os.path import join
 import re
+import sys
 
 
 infile = sys.argv[1]

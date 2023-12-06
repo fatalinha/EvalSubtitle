@@ -10,22 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-Computes BLEU and the difference between BLEU with and without breaks
-"""
-
 import os
 import re
 import sys
+
 from sacrebleu.metrics import BLEU
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
+
+DESCRIPTION = """
+Computes BLEU and the difference between BLEU with and without breaks
+"""
 
 
 def bleu_preprocess(infile, remove_eol=False, remove_eob=False, replace=False):
@@ -64,7 +66,7 @@ def bleu_process(reference_file, system_file, extra=False, no_break=False):
     sys = bleu_preprocess(system_file, remove_eol=no_break, remove_eob=no_break)
 
     bleu_score = bleu.corpus_score(sys, [ref])
-    signature = bleu.get_signature()
+    # signature = bleu.get_signature()
 
     if extra:
         # remove breaks

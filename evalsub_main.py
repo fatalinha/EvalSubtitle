@@ -10,11 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """ Run EvalSub tool to compute segmentation metrics
-"""
-
 import argparse
 import os.path
+
 import pandas as pd
 
 from evalsub.eval.seg_eval import seg_process
@@ -23,6 +21,10 @@ from evalsub.eval.cpl_eval import cpl_process
 from evalsub.eval.ter_eval import ter_process
 from evalsub.eval.sigma_eval import sigma_process
 import evalsub.util.constants as cst
+
+DESCRIPTION = """
+Run EvalSub tool to compute segmentation metrics
+"""
 
 
 def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
@@ -102,7 +104,8 @@ def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt
             ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, max_cpl=max_cpl,
             srt=srt, confidence_interval=confidence_interval)
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -156,7 +159,11 @@ def main(args):
     included_metrics = args.include
     excluded_metrics = args.exclude
     text = args.text
-    if not all_metrics and not standard_metrics and not end2end_metrics and included_metrics is None and excluded_metrics is None:
+    if (not all_metrics
+            and not standard_metrics
+            and not end2end_metrics
+            and included_metrics is None
+            and excluded_metrics is None):
         metrics = cst.DEFAULT_METRICS
     else:
         if standard_metrics:

@@ -10,23 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-Computes TER_br with and without replacement of type of breaks
-"""
-
 import os
 import re
 import sys
 
 from sacrebleu.metrics import TER
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
 from evalsub.util.util import preprocess
+
+DESCRIPTION = """
+Computes TER_br with and without replacement of type of breaks
+"""
 
 
 def ter_preprocess(infile, remove_eol=False, remove_eob=False, replace=False, srt=False):
@@ -46,7 +47,8 @@ def ter_preprocess(infile, remove_eol=False, remove_eob=False, replace=False, sr
 
     tagged_sents = tagged_str.splitlines()
     tagged_sents = [tagged_sent.strip() for tagged_sent in tagged_sents]
-    masked_sents = [re.sub(r"[^ %s%s]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), cst.MASK_CHAR, tagged_sent) for tagged_sent in tagged_sents]
+    masked_sents = [re.sub(r"[^ %s%s]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), cst.MASK_CHAR, tagged_sent)
+                    for tagged_sent in tagged_sents]
 
     return masked_sents
 
@@ -76,4 +78,3 @@ def ter_process(reference_file, system_file, srt=False, extra=False):
 
     print(signature)
     return ter_score
-

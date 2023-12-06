@@ -10,22 +10,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-The script breaks sentences before a maximum length is reached. 
-Selection of type of break <eol> or <eob> is done randomly by specifying the probability.
-"""
-
 import argparse
 import os
 import random
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
+
+DESCRIPTION = """
+The script breaks sentences before a maximum length is reached. 
+Selection of type of break <eol> or <eob> is done randomly by specifying the probability.
+"""
 
 
 def insert_symbol(in_str: str, max_pos: int, symbol: str = cst.CAPTION_TAG, prob: float = cst.PROBA) -> str:
@@ -42,7 +43,7 @@ def insert_symbol(in_str: str, max_pos: int, symbol: str = cst.CAPTION_TAG, prob
 
         # No space?Just return the input string
         # if first_space_pos == -1:
-            # return str(in_str + symbol)
+        #    return str(in_str + symbol)
 
         # Compute the space position in the non-reversed string
         last_space_pos = max_pos - first_space_pos

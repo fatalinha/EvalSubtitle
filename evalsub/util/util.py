@@ -14,7 +14,8 @@ import os
 import re
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
@@ -29,7 +30,7 @@ def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_
     Get the segmentation masses from a segmented subtitle file.
 
     :param file_path: segmented subtitle file (ttml or tagged text)
-    :param srt: wether file_path is in srt format
+    :param srt: whether file_path is in srt format
     :param ttml: whether file_path is in ttml format
     :param line_tag: end of line boundary tag
     :param caption_tag: end of caption/block boundary tag
@@ -63,8 +64,8 @@ def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_
     return eob_masses, eol_masses, eox_masses
 
 
-def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-                caption_holder=cst.CAPTION_HOLDER):
+def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
+                line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
     # Replacing 1-char placeholders with boundaries
     tagged_str = re.sub(line_holder, line_tag, tagged_str)
     tagged_str = re.sub(caption_holder, caption_tag, tagged_str)
@@ -137,6 +138,6 @@ def write_lines(lines, file_path, newline=True, add=False, make_dir=True, conver
     if convert:
         lines = map(str, lines)
     if newline:
-        lines = map(lambda l: l + '\n', lines)
+        lines = map(lambda line: line + '\n', lines)
     with open(file_path, mode) as file:
         file.writelines(lines)

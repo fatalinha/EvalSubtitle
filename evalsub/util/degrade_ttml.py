@@ -10,23 +10,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import argparse
+import random
+
+from ttml import TtmlReader, TtmlWriter, f_to_hmsf, hmsf_to_f
+
 DESCRIPTION = """
 A script to degrade subtitle segmentation (in lines and captions) in a ttml file.
 The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing
 boundaries with the other type.
 """
 
-import argparse
-import random
-
-from ttml import TtmlReader, TtmlWriter, f_to_hmsf, hmsf_to_f
-
-
 # Minimal number of frames between two captions
 F_SPACING = 8
 HALF_F_SPACING = int(F_SPACING/2)
 
-## SHIFT  ######################################################################
+
+# SHIFT  ###############################################################################################################
 
 def shift_eol(lines, n, p_eol):
     n_eol_shifts = 0
@@ -137,7 +137,8 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob):
     print('Writing...')
     ttml_writer.write()
 
-## ADD  ########################################################################
+
+# ADD  #################################################################################################################
 
 def add(input_file_path, output_file_path, p_eol, p_eob):
     """
@@ -222,7 +223,8 @@ def add(input_file_path, output_file_path, p_eol, p_eob):
     print('Writing...')
     ttml_writer.write()
 
-## DELETE  #####################################################################
+
+# DELETE  ##############################################################################################################
 
 def delete_eol(lines, p_eol):
     n_deleted_eol = 0
@@ -307,7 +309,8 @@ def delete(input_file_path, output_file_path, p_eol, p_eob):
     print('Writing...')
     ttml_writer.write()
 
-## REPLACE  ####################################################################
+
+# REPLACE  #############################################################################################################
 
 def replace(input_file_path, output_file_path, p_eol, p_eob):
     """
@@ -383,7 +386,8 @@ def replace(input_file_path, output_file_path, p_eol, p_eob):
     print('Writing...')
     ttml_writer.write()
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)

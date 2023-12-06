@@ -10,23 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-Computes the percentage of subtitles conforming to a max. length
-"""
-
 import argparse
 import os
 import re
 import statistics
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
 from evalsub.util.srt import SrtReader
+
+DESCRIPTION = """
+Computes the percentage of subtitles conforming to a max. length
+"""
 
 
 def cpl_process(sys_file_path, max_cpl=cst.MAX_CPL, srt=False, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):

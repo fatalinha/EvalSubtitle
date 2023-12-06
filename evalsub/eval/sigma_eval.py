@@ -22,7 +22,8 @@ from sacrebleu.metrics.base import Score
 from sacrebleu.tokenizers import tokenizer_13a
 tokenizer = tokenizer_13a.Tokenizer13a()
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
