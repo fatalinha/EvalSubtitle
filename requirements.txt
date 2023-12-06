@@ -1,9 +1,8 @@
+# Requirements for EvalSubtitle main script
+numpy
+pandas
 sacrebleu>=2.0.0
 segeval=2.0.11
-pandas=1.1.3
-pandas~=1.2.2
-matplotlib~=3.3.4
-segeval~=2.0.11
-sacremoses~=0.0.46
-srt~=3.5.0
-numpy
+# Additional requirements for LREC 2022 experiments replication scripts
+matplotlib
+sacremoses
