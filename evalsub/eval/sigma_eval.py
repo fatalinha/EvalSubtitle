@@ -65,7 +65,7 @@ def sigma_preprocess(ref_file_path, sys_file_path, srt=False, auto_seg=False):
 
     if auto_seg:
         sys_tagged_str = suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER,
-                                        caption_holder=cst.CAPTION_HOLDER)
+                                        caption_holder=cst.CAPTION_HOLDER, sys_file_path=sys_file_path)
 
     ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess_aux(ref_tagged_str)
     sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess_aux(sys_tagged_str)

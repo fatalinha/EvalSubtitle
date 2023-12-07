@@ -112,6 +112,7 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
     else:
         tagged_str = open(input_file_path).read()
 
+    tagged_str = tagged_str.strip()
     # Removing potential multiple spaces
     tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Removing potential spaces in the beginning of file lines
@@ -157,19 +158,24 @@ def suber_format(tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAP
     return suber_segments
 
 
-def suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
+def suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER,
+                   sys_file_path=None):
     ref_suber_segments = suber_format(ref_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
     sys_suber_segments = suber_format(sys_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
     sys_suber_auto_segments = levenshtein_align_hypothesis_to_reference(hypothesis=sys_suber_segments,
                                                                         reference=ref_suber_segments)
-    sys_tagged_str = "\n".join([segment_to_string(segment, include_line_breaks=True)
-                                for segment in sys_suber_auto_segments])
+    sys_tagged_sents = [segment_to_string(segment, include_line_breaks=True) for segment in sys_suber_auto_segments]
+    sys_tagged_str = "\n".join(sys_tagged_sents)
 
     # Removing spaces around boundaries (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
     sys_tagged_str = re.sub(r"( )?(%s|%s)( )?" % (cst.LINE_TAG, cst.CAPTION_TAG), r"\2", sys_tagged_str)
     # Replacing boundaries with 1-char placeholders (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
     sys_tagged_str = re.sub(cst.LINE_TAG, line_holder, sys_tagged_str)
     sys_tagged_str = re.sub(cst.CAPTION_TAG, caption_holder, sys_tagged_str)
+
+    if sys_file_path is not None:
+        auto_seg_file_path = os.path.splitext(sys_file_path)[0] + "_AS.txt"
+        write_lines(sys_tagged_sents, auto_seg_file_path)
 
     return sys_tagged_str
 

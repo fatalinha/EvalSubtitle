@@ -135,7 +135,7 @@ def parse_args():
                         help="CSV file where to write the results.")
 
     parser.add_argument('--srt', '-srt', action='store_true',
-                        help="Whether the subtitle files are in srt format.")
+                        help="Whether the subtitle files are in SRT format.")
     parser.add_argument('--auto_segmentation', '-as', action='store_true',
                         help="Whether to use automatic segmentation for system sequences.")
 
