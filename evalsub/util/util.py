@@ -14,6 +14,10 @@ import os
 import re
 import sys
 
+import suber.data_types as subertyp
+from suber.hyp_to_ref_alignment import levenshtein_align_hypothesis_to_reference
+from suber.utilities import segment_to_string
+
 # We include the path of the toplevel package in the system path,
 # so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -127,6 +131,47 @@ def replace_char(string, pos, c):
 
 def replace_substring(string, start, end, substring):
     return string[:start] + substring + string[end:]
+
+
+def suber_format(tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
+    # Inserting spaces besides 1-char placeholders
+    tagged_str = re.sub(r"(%s|%s)" % (line_holder, caption_holder), r" \1 ", tagged_str)
+
+    tagged_sents = tagged_str.splitlines()
+    suber_segments = []
+    for tagged_sent in tagged_sents:
+        tokens = tagged_sent.split()
+        token_list = []
+        for token in tokens:
+            if token in (line_holder, caption_holder):
+                if not token_list:
+                    continue  # ignore line break symbol at the start of the line
+                else:
+                    token_list[-1].line_break = (
+                        subertyp.LineBreak.END_OF_BLOCK if token == caption_holder else subertyp.LineBreak.END_OF_LINE)
+            else:
+                token_list.append(subertyp.Word(string=token))
+
+        suber_segments.append(subertyp.Segment(word_list=token_list))
+
+    return suber_segments
+
+
+def suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
+    ref_suber_segments = suber_format(ref_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
+    sys_suber_segments = suber_format(sys_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
+    sys_suber_auto_segments = levenshtein_align_hypothesis_to_reference(hypothesis=sys_suber_segments,
+                                                                        reference=ref_suber_segments)
+    sys_tagged_str = "\n".join([segment_to_string(segment, include_line_breaks=True)
+                                for segment in sys_suber_auto_segments])
+
+    # Removing spaces around boundaries (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
+    sys_tagged_str = re.sub(r"( )?(%s|%s)( )?" % (cst.LINE_TAG, cst.CAPTION_TAG), r"\2", sys_tagged_str)
+    # Replacing boundaries with 1-char placeholders (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
+    sys_tagged_str = re.sub(cst.LINE_TAG, line_holder, sys_tagged_str)
+    sys_tagged_str = re.sub(cst.CAPTION_TAG, caption_holder, sys_tagged_str)
+
+    return sys_tagged_str
 
 
 def write_lines(lines, file_path, newline=True, add=False, make_dir=True, convert=False):

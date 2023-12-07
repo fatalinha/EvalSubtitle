@@ -28,7 +28,7 @@ Run EvalSub tool to compute segmentation metrics
 
 
 def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
-                   srt=False, confidence_interval=False):
+                   srt=False, auto_seg=False, confidence_interval=False):
 
     results[cst.SYSTEM].append(os.path.basename(sys_file_path))
     print("Evaluating " + sys_file_path)
@@ -59,8 +59,8 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
         print("CPL conformity: " + str(round(cpl_conf, 2)) + '%')
 
     if cst.BLEU_BR in results or cst.BLEU_NB in results or cst.SIGMA in results:
-        sigma_score = sigma_process(
-            ref_file_path, sys_file_path, srt=srt, confidence_interval=confidence_interval)
+        sigma_score = sigma_process(ref_file_path, sys_file_path, srt=srt, auto_seg=auto_seg,
+                                    confidence_interval=confidence_interval)
         bleu_br = sigma_score[cst.BLEU_BR]
         bleu_nb = sigma_score[cst.BLEU_NB]
         alpha = sigma_score[cst.ALPHA]
@@ -78,7 +78,7 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
             print('Sigma: ' + sigma.format(score_only=True))
 
     if cst.TER_BR in results:
-        ter_br = ter_process(ref_file_path, sys_file_path, srt=srt).score
+        ter_br = ter_process(ref_file_path, sys_file_path, srt=srt, auto_seg=auto_seg).score
         results[cst.TER_BR].append(ter_br)
         print('TER_br: ' + str(round(ter_br, 2)))
 
@@ -97,12 +97,12 @@ def run_evaluation(ref_file_path, sys_file_path, results, window_size=None, nt=c
 
 
 def run_evaluations(ref_file_path, sys_file_paths, results, window_size=None, nt=cst.DEFAULT_NT, max_cpl=cst.MAX_CPL,
-                    srt=False, confidence_interval=False):
+                    srt=False, auto_seg=False, confidence_interval=False):
 
     for sys_file_path in sys_file_paths:
         run_evaluation(
             ref_file_path, sys_file_path, results, window_size=window_size, nt=nt, max_cpl=max_cpl,
-            srt=srt, confidence_interval=confidence_interval)
+            srt=srt, auto_seg=auto_seg, confidence_interval=confidence_interval)
 
 
 # MAIN  ################################################################################################################
@@ -121,7 +121,7 @@ def parse_args():
     parser.add_argument('--exclude', '-e', type=str, nargs='+',
                         help="Compute all but the specified metrics.")
     parser.add_argument('--text', '-t', type=str, choices=['perfect', 'imperfect'],
-                        help="Wether the text from system subtitles is identical "
+                        help="Whether the text from system subtitles is identical "
                              "to the text from reference subtitles (perfect), or not (imperfect). "
                              "(Can be used as a safeguard to prevent computing standard metrics "
                              "with imperfect text)")
@@ -136,6 +136,8 @@ def parse_args():
 
     parser.add_argument('--srt', '-srt', action='store_true',
                         help="Whether the subtitle files are in srt format.")
+    parser.add_argument('--auto_segmentation', '-as', action='store_true',
+                        help="Whether to use automatic segmentation for system sequences.")
 
     parser.add_argument('--window_size', '-k', type=int,
                         help="Window size for the window-based segmentation evaluation.")
@@ -199,6 +201,7 @@ def main(args):
     ref_file_path = args.reference_file
     res_file_path = args.results_file
     srt = args.srt
+    auto_seg = args.auto_segmentation
     confidence_interval = args.confidence_interval
     window_size = args.window_size
     nt = args.max_transpo
@@ -206,7 +209,7 @@ def main(args):
 
     run_evaluations(
         ref_file_path, sys_file_paths, results, window_size=window_size, nt=nt, max_cpl=max_cpl,
-        srt=srt, confidence_interval=confidence_interval)
+        srt=srt, auto_seg=auto_seg, confidence_interval=confidence_interval)
 
     # Write to csv file
     print('Writing results to csv file:', res_file_path)

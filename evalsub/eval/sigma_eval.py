@@ -19,8 +19,6 @@ import sys
 import numpy as np
 from sacrebleu.metrics import BLEU
 from sacrebleu.metrics.base import Score
-from sacrebleu.tokenizers import tokenizer_13a
-tokenizer = tokenizer_13a.Tokenizer13a()
 
 # We include the path of the toplevel package in the system path,
 # so we can always use absolute imports within the package.
@@ -29,12 +27,10 @@ if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
-from evalsub.util.util import preprocess
+from evalsub.util.util import preprocess, suber_auto_seg
 
 
-def sigma_preprocess(file_path, srt=False):
-    tagged_str = preprocess(file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-                            caption_holder=cst.CAPTION_HOLDER, srt=srt)
+def sigma_preprocess_aux(tagged_str):
     n_boundaries = len(list(re.finditer(r"%s|%s" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
     n_words = len(list(re.finditer(r"[^ %s%s\r\n]+" % (cst.LINE_HOLDER, cst.CAPTION_HOLDER), tagged_str)))
 
@@ -61,6 +57,23 @@ def sigma_preprocess(file_path, srt=False):
     return alpha, sents, tagged_sents
 
 
+def sigma_preprocess(ref_file_path, sys_file_path, srt=False, auto_seg=False):
+    ref_tagged_str = preprocess(ref_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
+                                line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER, srt=srt)
+    sys_tagged_str = preprocess(sys_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
+                                line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER, srt=srt)
+
+    if auto_seg:
+        sys_tagged_str = suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER,
+                                        caption_holder=cst.CAPTION_HOLDER)
+
+    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess_aux(ref_tagged_str)
+    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess_aux(sys_tagged_str)
+    alpha = sys_alpha
+
+    return alpha, ref_sents, ref_tagged_sents, sys_sents, sys_tagged_sents
+
+
 def sigma(alpha, bleu_nb_score, bleu_br_score):
     p1, p2, p3, p4 = bleu_nb_score.precisions
     bleu_br = bleu_br_score.score
@@ -84,18 +97,18 @@ def __bs_idxs(size, n_samples=1000):
     return rng.choice(size, size=(n_samples, size), replace=True)
 
 
-def sigma_process(ref_file_path, sys_file_path, srt=False, confidence_interval=False):
+def sigma_process(ref_file_path, sys_file_path, srt=False, auto_seg=False, confidence_interval=False):
     bleu = BLEU()
 
-    ref_alpha, ref_sents, ref_tagged_sents = sigma_preprocess(ref_file_path, srt=srt)
-    sys_alpha, sys_sents, sys_tagged_sents = sigma_preprocess(sys_file_path, srt=srt)
+    alpha, ref_sents, ref_tagged_sents, sys_sents, sys_tagged_sents = sigma_preprocess(
+        ref_file_path, sys_file_path, srt=srt, auto_seg=auto_seg)
 
     assert len(sys_sents) == len(ref_sents)
 
     bleu_nb_score = bleu.corpus_score(sys_sents, [ref_sents])
     bleu_br_score = bleu.corpus_score(sys_tagged_sents, [ref_tagged_sents])
 
-    sigma_score = sigma(sys_alpha, bleu_nb_score, bleu_br_score)
+    sigma_score = sigma(alpha, bleu_nb_score, bleu_br_score)
 
     if confidence_interval:
         bleu_nb_stats = bleu._extract_corpus_statistics(sys_sents, [ref_sents])
@@ -112,7 +125,7 @@ def sigma_process(ref_file_path, sys_file_path, srt=False, confidence_interval=F
         bleu_br_scores = [
             bleu._compute_score_from_stats(_s.sum(0)) for _s in bleu_br_stats_np[idxs]]
         sigma_scores = [
-            sigma(sys_alpha, _bleu_nb, _bleu_br)
+            sigma(alpha, _bleu_nb, _bleu_br)
             for _bleu_nb, _bleu_br in zip(bleu_nb_scores, bleu_br_scores)]
         bleu_nb_score.estimate_ci(bleu_nb_scores)
         bleu_br_score.estimate_ci(bleu_br_scores)
@@ -120,7 +133,7 @@ def sigma_process(ref_file_path, sys_file_path, srt=False, confidence_interval=F
 
     return {
         cst.SIGMA: sigma_score,
-        cst.ALPHA: sys_alpha,
+        cst.ALPHA: alpha,
         cst.BLEU_NB: bleu_nb_score,
         cst.BLEU_BR: bleu_br_score}
 
