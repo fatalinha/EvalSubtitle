@@ -14,7 +14,12 @@ import os
 import re
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+import suber.data_types as subertyp
+from suber.hyp_to_ref_alignment import levenshtein_align_hypothesis_to_reference
+from suber.utilities import segment_to_string
+
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
@@ -29,7 +34,7 @@ def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_
     Get the segmentation masses from a segmented subtitle file.
 
     :param file_path: segmented subtitle file (ttml or tagged text)
-    :param srt: wether file_path is in srt format
+    :param srt: whether file_path is in srt format
     :param ttml: whether file_path is in ttml format
     :param line_tag: end of line boundary tag
     :param caption_tag: end of caption/block boundary tag
@@ -63,8 +68,8 @@ def get_masses(file_path, srt=False, ttml=False, line_tag=cst.LINE_TAG, caption_
     return eob_masses, eol_masses, eox_masses
 
 
-def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG, line_holder=cst.LINE_HOLDER,
-                caption_holder=cst.CAPTION_HOLDER):
+def postprocess(tagged_str, output_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
+                line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
     # Replacing 1-char placeholders with boundaries
     tagged_str = re.sub(line_holder, line_tag, tagged_str)
     tagged_str = re.sub(caption_holder, caption_tag, tagged_str)
@@ -107,6 +112,7 @@ def preprocess(input_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_T
     else:
         tagged_str = open(input_file_path).read()
 
+    tagged_str = tagged_str.strip()
     # Removing potential multiple spaces
     tagged_str = re.sub(r" {2,}", r" ", tagged_str)
     # Removing potential spaces in the beginning of file lines
@@ -128,6 +134,52 @@ def replace_substring(string, start, end, substring):
     return string[:start] + substring + string[end:]
 
 
+def suber_format(tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER):
+    # Inserting spaces besides 1-char placeholders
+    tagged_str = re.sub(r"(%s|%s)" % (line_holder, caption_holder), r" \1 ", tagged_str)
+
+    tagged_sents = tagged_str.splitlines()
+    suber_segments = []
+    for tagged_sent in tagged_sents:
+        tokens = tagged_sent.split()
+        token_list = []
+        for token in tokens:
+            if token in (line_holder, caption_holder):
+                if not token_list:
+                    continue  # ignore line break symbol at the start of the line
+                else:
+                    token_list[-1].line_break = (
+                        subertyp.LineBreak.END_OF_BLOCK if token == caption_holder else subertyp.LineBreak.END_OF_LINE)
+            else:
+                token_list.append(subertyp.Word(string=token))
+
+        suber_segments.append(subertyp.Segment(word_list=token_list))
+
+    return suber_segments
+
+
+def suber_auto_seg(ref_tagged_str, sys_tagged_str, line_holder=cst.LINE_HOLDER, caption_holder=cst.CAPTION_HOLDER,
+                   sys_file_path=None):
+    ref_suber_segments = suber_format(ref_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
+    sys_suber_segments = suber_format(sys_tagged_str, line_holder=line_holder, caption_holder=caption_holder)
+    sys_suber_auto_segments = levenshtein_align_hypothesis_to_reference(hypothesis=sys_suber_segments,
+                                                                        reference=ref_suber_segments)
+    sys_tagged_sents = [segment_to_string(segment, include_line_breaks=True) for segment in sys_suber_auto_segments]
+    sys_tagged_str = "\n".join(sys_tagged_sents)
+
+    # Removing spaces around boundaries (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
+    sys_tagged_str = re.sub(r"( )?(%s|%s)( )?" % (cst.LINE_TAG, cst.CAPTION_TAG), r"\2", sys_tagged_str)
+    # Replacing boundaries with 1-char placeholders (it is important to keep cst.LINE_TAG and cst.CAPTION_TAG here)
+    sys_tagged_str = re.sub(cst.LINE_TAG, line_holder, sys_tagged_str)
+    sys_tagged_str = re.sub(cst.CAPTION_TAG, caption_holder, sys_tagged_str)
+
+    if sys_file_path is not None:
+        auto_seg_file_path = os.path.splitext(sys_file_path)[0] + "_AS.txt"
+        write_lines(sys_tagged_sents, auto_seg_file_path)
+
+    return sys_tagged_str
+
+
 def write_lines(lines, file_path, newline=True, add=False, make_dir=True, convert=False):
     mode = 'a' if add else 'w'
     if make_dir:
@@ -137,6 +189,6 @@ def write_lines(lines, file_path, newline=True, add=False, make_dir=True, conver
     if convert:
         lines = map(str, lines)
     if newline:
-        lines = map(lambda l: l + '\n', lines)
+        lines = map(lambda line: line + '\n', lines)
     with open(file_path, mode) as file:
         file.writelines(lines)

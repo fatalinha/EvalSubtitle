@@ -10,16 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-A script to convert subtitles from an srt file to a ttml file.
-The color of the lines (not contained in srt) will be set to white by default.
-"""
-
 import argparse
 import re
 
 from srt import SrtReader
 from ttml import TtmlWriter
+
+DESCRIPTION = """
+A script to convert subtitles from an srt file to a ttml file.
+The color of the lines (not contained in srt) will be set to white by default.
+"""
 
 
 def convert(input_file_path, output_file_path):
@@ -44,7 +44,8 @@ def convert_multiple(input_file_paths, output_file_paths=None):
     for input_file_path, output_file_path in zip(input_file_paths, output_file_paths):
         convert(input_file_path, output_file_path)
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)

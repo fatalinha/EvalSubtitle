@@ -10,10 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-Script to compute the standard segmentation metrics for a pair of segmented subtitle files.
-"""
-
 import argparse
 import json
 import os
@@ -21,13 +17,18 @@ import sys
 
 import segeval
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.constants as cst
 from evalsub.util.util import get_masses
+
+DESCRIPTION = """
+Script to compute the standard segmentation metrics for a pair of segmented subtitle files.
+"""
 
 
 METRICS = frozenset({cst.PK, cst.WIN_DIFF, cst.SEG_SIM, cst.BOUND_SIM})
@@ -55,14 +56,14 @@ def masses_to_sets(eob_masses, eol_masses, eox_masses):
     return eob_sets, eol_sets, eox_sets, eob_eol_sets
 
 
-def eval_seg(sys_file_path, ref_file_path, metrics=METRICS ,srt=False, ttml=False, eol_window_size=None,
+def eval_seg(sys_file_path, ref_file_path, metrics=METRICS, srt=False, ttml=False, eol_window_size=None,
              eob_window_size=None, eox_window_size=None, nt=cst.DEFAULT_NT, line_tag=cst.LINE_TAG,
              caption_tag=cst.CAPTION_TAG):
 
     sys_eob_masses, sys_eol_masses, sys_eox_masses = get_masses(sys_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
-                                                             caption_tag=caption_tag)
+                                                                caption_tag=caption_tag)
     ref_eob_masses, ref_eol_masses, ref_eox_masses = get_masses(ref_file_path, srt=srt, ttml=ttml, line_tag=line_tag,
-                                                             caption_tag=caption_tag)
+                                                                caption_tag=caption_tag)
     sys_eob_sets, sys_eol_sets, sys_eox_sets, sys_eob_eol_sets = masses_to_sets(sys_eob_masses, sys_eol_masses,
                                                                                 sys_eox_masses)
     ref_eob_sets, ref_eol_sets, ref_eox_sets, ref_eob_eol_sets = masses_to_sets(ref_eob_masses, ref_eol_masses,
@@ -223,7 +224,7 @@ def seg_process(sys_file_path, ref_file_path, srt=False, ttml=False, window_size
     return eox_window_size, pk, window_diff, seg_sim, bound_sim
 
 
-## MAIN  #######################################################################
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -269,7 +270,7 @@ def main(args):
     sys_file_path = args.system_file
     ref_file_path = args.reference_file
     json_file_path = args.json_file
-    csv_file_path = args.csv_file #TODO?
+    # csv_file_path = args.csv_file  # TODO?
 
     ttml = args.ttml
 
@@ -278,7 +279,7 @@ def main(args):
     eox_window_size = args.eox_window_size
 
     results = eval_seg(sys_file_path, ref_file_path, metrics=metrics, ttml=ttml, eol_window_size=eol_window_size,
-             eob_window_size=eob_window_size, eox_window_size=eox_window_size)
+                       eob_window_size=eob_window_size, eox_window_size=eox_window_size)
 
     if json_file_path is not None:
         json.dump(results, open(json_file_path, 'w'), ensure_ascii=False, indent=3, sort_keys=True)

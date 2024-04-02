@@ -26,13 +26,13 @@ except ImportError:
     textstat = None
     FRE = False
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
 
 import evalsub.util.util as utl
-
 
 COLOR_FILTER = frozenset(['magenta', 'red'])
 MAX_CPL = 36
@@ -46,6 +46,7 @@ ET.register_namespace('', 'http://www.w3.org/ns/ttml')
 ET.register_namespace('ttm', 'http://www.w3.org/ns/ttml#metadata')
 ET.register_namespace('ttp', 'http://www.w3.org/ns/ttml#parameter')
 ET.register_namespace('tts', 'http://www.w3.org/ns/ttml#styling')
+
 
 def indent(elem, level=0):
     """
@@ -114,7 +115,8 @@ def hmsf_to_s(hmsf):
 def find_eos_positions(s):
     return [m.end() for m in re.finditer(r'((?<!["( -][A-Z])\.|[!?])([")])?(?= |$)', s)]
 
-## READER  #####################################################################
+
+# READER  ##############################################################################################################
 
 class TtmlReader:
     def __init__(self, file_path, filtering=False, masking=False):
@@ -132,7 +134,8 @@ class TtmlReader:
         self.color_filter = COLOR_FILTER
         # For statistics
         self.n_filled_captions = 0
-        self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0), ('white', 0)])
+        self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0),
+                                        ('white', 0)])
         self.n_over_cpl_lines = 0
         self.n_over_cps_captions = 0
         self.cps_sum = 0
@@ -146,14 +149,15 @@ class TtmlReader:
         
         # For statistics
         self.n_filled_captions = 0
-        self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0), ('white', 0)])
+        self.color_count = OrderedDict([('Cyan', 0), ('green', 0), ('magenta', 0), ('red', 0), ('yellow', 0),
+                                        ('white', 0)])
         self.n_over_cpl_lines = 0
         self.n_over_cps_captions = 0
         self.cps_sum = 0
         self.n_cps = 0
     
     def read_line(self):
-        #print("\t\tRead line", self.caption_next_index, self.line_next_index)#DEBUG#
+        # print("\t\tRead line", self.caption_next_index, self.line_next_index)#DEBUG#
         if self.is_file_over():
             return ''
         
@@ -162,7 +166,8 @@ class TtmlReader:
         
         self.line_next_index += 1
         # There might be empty captions...
-        while (self.caption_next_index < len(self.root[1][0])) and (self.line_next_index == len(self.root[1][0][self.caption_next_index])):
+        while ((self.caption_next_index < len(self.root[1][0]))
+               and (self.line_next_index == len(self.root[1][0][self.caption_next_index]))):
             self.caption_next_index += 1
             self.line_next_index = 0
         
@@ -190,20 +195,20 @@ class TtmlReader:
             # Else, if masking is active, and that the line color is among those filtered
             elif self.masking and color in self.color_filter:
                 # masked line text is returned
-                #print("\t\t\t", line.text)#DEBUG#
+                # print("\t\t\t", line.text)  # DEBUG
                 return len(line.text)*MASK_CHAR
             # Else
             else:
                 # line text is returned
-                #print("\t\t\t", line.text)#DEBUG#
+                # print("\t\t\t", line.text)  # DEBUG
                 return line.text
     
     def read_caption(self, flat=True):
-        #print("\tRead caption", self.caption_next_index)#DEBUG#
+        # print("\tRead caption", self.caption_next_index)  # DEBUG
         if self.is_file_over():
             return '' if flat else []
 
-        self.n_filled_captions +=1
+        self.n_filled_captions += 1
         lines = list()
         caption_current_index = self.caption_next_index
         
@@ -231,7 +236,7 @@ class TtmlReader:
         return caption
     
     def read_all(self, flat=True):
-        #print("Read all", len(self.root[1][0]) - self.caption_next_index)#DEBUG#
+        # print("Read all", len(self.root[1][0]) - self.caption_next_index)  # DEBUG
         captions = list()
         
         while not self.is_file_over():
@@ -302,7 +307,7 @@ class TtmlReader:
     # "current" = wrt the last read line
     def current_color(self):
         line = self.root[1][0][self.caption_index][self.line_index]
-        color = line.attrib['{http://www.w3.org/ns/ttml#styling}color']  #TODO à revoir...
+        color = line.attrib['{http://www.w3.org/ns/ttml#styling}color']  # TODO à revoir...
         return color
     
     def is_next_break(self):
@@ -311,7 +316,8 @@ class TtmlReader:
     def is_file_over(self):
         return self.caption_next_index >= len(self.root[1][0])
 
-## WRITER  #####################################################################
+
+# WRITER  ##############################################################################################################
 
 class TtmlWriter:
     def __init__(self, output_file_path, title='no title'):
@@ -346,20 +352,21 @@ class TtmlWriter:
     def add_break(self):
         ET.SubElement(self.root[1][0][-1], 'br')
 
-## FUNCTIONS  ##################################################################
+
+# FUNCTIONS  ###########################################################################################################
 
 def hash_sub(ttml_file_path):
-    #print('Computing the hash fingerprint:')
-    #print('Initializing...')
+    # print('Computing the hash fingerprint:')
+    # print('Initializing...')
     ttml_reader = TtmlReader(ttml_file_path, filtering=False, masking=False)
     
-    #print('Reading file...')
+    # print('Reading file...')
     all_sub = ttml_reader.read_all()
     
-    #print('Applying md5 function...')
-    hashKey = hashlib.md5(all_sub.encode()).hexdigest()
+    # print('Applying md5 function...')
+    hash_key = hashlib.md5(all_sub.encode()).hexdigest()
     
-    return hashKey
+    return hash_key
 
 
 def make_sub_stats(ttml_file_path):
@@ -403,8 +410,8 @@ def make_sub_stats(ttml_file_path):
     # Nb of words in the subtitles (before filtering)
     sub_stats['n_words'] = n_sub_words
     # Duration of subtitles display
-    subDuration = ttml_reader.total_duration()
-    sub_stats['duration'] = subDuration
+    sub_duration = ttml_reader.total_duration()
+    sub_stats['duration'] = sub_duration
     # Nb of captions
     n_captions = ttml_reader.n_captions()
     sub_stats['n_captions'] = n_captions
@@ -450,7 +457,8 @@ def ttml_to_tagged_str(ttml_file_path, filtering=True, masking=False, line_tag=L
 
     return all_sub, time_spans
 
-## MAIN FUNCTIONS  #############################################################
+
+# MAIN FUNCTIONS  ######################################################################################################
 
 def read_sub(ttml_file_path, text_file_path, filtering=True, masking=False):
     print('Extracting subtitles:')
@@ -498,7 +506,8 @@ def ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path,
         utl.write_lines(time_spans, timecode_file_path)
 
 
-def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path, line_tag=LINE_TAG, caption_tag=CAPTION_TAG):
+def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path, line_tag=LINE_TAG,
+                       caption_tag=CAPTION_TAG):
     print('Converting tagged text into ttml:')
     print('Initializing...')
     ttml_writer = TtmlWriter(ttml_file_path)
@@ -510,17 +519,18 @@ def tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path,
     captions = [caption.strip().split(line_tag) for caption in tagged_txt.split(caption_tag)[:-1]]
     
     timecode_lines = open(timecode_file_path, 'r').readlines()
-    time_spans = [timecode_line.split() for timecode_line in  timecode_lines]
+    time_spans = [timecode_line.split() for timecode_line in timecode_lines]
     
     print('Writing...')
-    assert(len(captions) == len(time_spans))
+    assert len(captions) == len(time_spans)
     for caption, time_span in zip(captions, time_spans):
         begin, end = time_span
         ttml_writer.add_caption(caption, begin, end, 'white')
     
     ttml_writer.write()
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -554,7 +564,8 @@ def main(args):
         read_sub(ttml_file_path, text_file_path, filtering=filtering, masking=masking)
     
     elif mode == 'ttml2tagged':
-        ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path, filtering=filtering, masking=masking)
+        ttml_to_tagged_txt(ttml_file_path, tagged_txt_file_path, timecode_file_path,
+                           filtering=filtering, masking=masking)
     
     elif mode == 'tagged2ttml':
         tagged_txt_to_ttml(ttml_file_path, tagged_txt_file_path, timecode_file_path)

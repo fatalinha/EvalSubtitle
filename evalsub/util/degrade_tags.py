@@ -10,19 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-DESCRIPTION = """
-A script to degrade subtitle segmentation (in lines and captions) in a tagged txt file.
-The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing
-boundaries with the other type.
-"""
-
 import argparse
 import os
 import random
 import re
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
@@ -30,7 +25,14 @@ if toplevel_path not in sys.path:
 import evalsub.util.constants as cst
 from evalsub.util.util import postprocess, preprocess, replace_char
 
-## SHIFT  ######################################################################
+DESCRIPTION = """
+A script to degrade subtitle segmentation (in lines and captions) in a tagged txt file.
+The degradation can be achieved by shifting boundaries, adding new boundaries, deleting boundaries, or replacing
+boundaries with the other type.
+"""
+
+
+# SHIFT  ###############################################################################################################
 
 def shift_boundary(tagged_txt, n, slot_positions, i):
     # The boundary initial slot is filled with a space
@@ -42,7 +44,7 @@ def shift_boundary(tagged_txt, n, slot_positions, i):
     # unless it crosses another boundary
     t = i
     step = random.randint(0, 1) * 2 - 1
-    while 0 <= t < len(slot_positions) and tagged_txt[slot_positions[t]] == ' ' and abs(t - i) <= n :
+    while 0 <= t < len(slot_positions) and tagged_txt[slot_positions[t]] == ' ' and abs(t - i) <= n:
         t += step
     # The boundary is reinserted in the target slot
     t -= step
@@ -93,7 +95,8 @@ def shift(input_file_path, output_file_path, n, p_eol, p_eob, line_tag=cst.LINE_
     stats = [n_eol, n_eob, n_eol_shifts, n_eob_shifts]
     return stats
 
-## ADD  ########################################################################
+
+# ADD  #################################################################################################################
 
 def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG,
         wrt_n_boundaries=False):
@@ -147,7 +150,8 @@ def add(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, 
     stats = [n_eol, n_eob, n_eol_additions, n_eob_additions]
     return stats
 
-## DELETE  #####################################################################
+
+# DELETE  ##############################################################################################################
 
 def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
@@ -185,7 +189,8 @@ def delete(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TA
     stats = [n_eol, n_eob, n_eol_deletions, n_eob_deletions]
     return stats
 
-## REPLACE  ####################################################################
+
+# REPLACE  #############################################################################################################
 
 def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     """
@@ -226,7 +231,8 @@ def replace(input_file_path, output_file_path, p_eol, p_eob, line_tag=cst.LINE_T
     stats = [n_eol, n_eob, n_eol_replacements, n_eob_replacements]
     return stats
 
-## MIXED  ######################################################################
+
+# MIXED  ###############################################################################################################
 
 def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_eob_del,
           p_eol_rep, p_eob_rep, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
@@ -239,7 +245,7 @@ def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_
 
     n_eol = len(eol_positions)
     n_eob = len(eob_positions)
-    n_spaces = len(space_positions)
+    # n_spaces = len(space_positions)
 
     # n_eol_shifts = round(p_eol_shift * n_eol)
     # n_eob_shifts = round(p_eob_shift * n_eob)
@@ -304,7 +310,8 @@ def mixed(input_file_path, output_file_path, p_eol_add, p_eob_add, p_eol_del, p_
 
     return n_eol, n_eob
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -322,8 +329,10 @@ def parse_args():
                         help="percentage of eol boundaries to be affected")
     parser.add_argument('--percentage_eob', '-peob', type=float, default=0.0,
                         help="percentage of eob boundaries to be affected")
-    parser.add_argument('--with_respect_to', '-wrt', type=str, choices=['n_bound', 'n_spaces'], default='n_bound',
-                        help="wether proportions are relative to the number of boundaries, or to the number of free slots")
+    parser.add_argument('--with_respect_to', '-wrt',
+                        type=str, choices=['n_bound', 'n_spaces'], default='n_bound',
+                        help="wether proportions are relative to the number of boundaries, "
+                             "or to the number of free slots")
 
     args = parser.parse_args()
     return args
