@@ -13,8 +13,7 @@ python bleu-br_upper_bound.py --output_dir . --results_file results_exp2.csv
 ```
 
 ## Experiment 3: Boundary projection
-First get the required MWER Segmenter
-```wget https://github.com/PeganovAnton/mwerSegmenter/blob/main/mwerSegmenter```
+This experiment requires the MWER Segmenter, which is downloaded from [https://github.com/PeganovAnton/mwerSegmenter/blob/main/mwerSegmenter](https://github.com/fatalinha/mwerSegmenter3.git)
 
 Run the boundary projection method
 ```
