@@ -10,12 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import random
 import os
+import random
 import re
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
@@ -23,7 +24,8 @@ if toplevel_path not in sys.path:
 import evalsub.util.constants as cst
 from evalsub.util.util import postprocess, preprocess, replace_char, replace_substring
 
-## MIXED  ######################################################################
+
+# MIXED  ###############################################################################################################
 
 def mixed(input_file_path, output_file_path, p_add, p_del, p_rep, line_tag=cst.LINE_TAG, caption_tag=cst.CAPTION_TAG):
     print('Initializing...')

@@ -15,7 +15,8 @@ import os
 import re
 import sys
 
-# We include the path of the toplevel package in the system path so we can always use absolute imports within the package.
+# We include the path of the toplevel package in the system path,
+# so we can always use absolute imports within the package.
 toplevel_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if toplevel_path not in sys.path:
     sys.path.insert(1, toplevel_path)
@@ -38,6 +39,7 @@ def hms_to_hmsf(hms):
     
     return '%s:%s:%s:%02d' % (h, m, s, f)
 
+
 def hmsf_to_hms(hmsf):
     """
     Converts a timecode from hmsf to hms format.
@@ -51,7 +53,8 @@ def hmsf_to_hms(hmsf):
     
     return '%s:%s:%s,%03d' % (h, m, s, ms)
 
-## READER  #####################################################################
+
+# READER  ##############################################################################################################
 
 class SrtCaption:
     def __init__(self, file_lines):
@@ -60,6 +63,7 @@ class SrtCaption:
         self.begin = hms_to_hmsf(begin)
         self.end = hms_to_hmsf(end)
         self.lines = file_lines[2:]
+
 
 class SrtReader:
     def __init__(self, file_path):
@@ -106,9 +110,10 @@ class SrtReader:
         return self.caption.begin, self.caption.end
     
     def current_lines(self):
-        return  self.caption.lines
+        return self.caption.lines
 
-## WRITER  #####################################################################
+
+# WRITER  ##############################################################################################################
 
 class SrtWriter:
     def __init__(self, file_path):
@@ -170,7 +175,7 @@ def srt_to_tagged_sents(srt_file_path, line_tag=cst.LINE_TAG, caption_tag=cst.CA
     return tagged_sents, time_spans
 
 
-## MAIN FUNCTIONS  #############################################################
+# MAIN FUNCTIONS  ######################################################################################################
 
 def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, line_tag=cst.LINE_TAG,
                       caption_tag=cst.CAPTION_TAG):
@@ -185,9 +190,10 @@ def srt_to_tagged_txt(srt_file_path, tagged_txt_file_path, timecode_file_path, l
 
 
 def tagged_txt_to_srt(srt_file_path, tagged_txt_file_path, timecode_file_path):
-    print("to do") # TODO?
+    print("to do")  # TODO?
 
-## MAIN  #######################################################################
+
+# MAIN  ################################################################################################################
 
 def parse_args():
     parser = argparse.ArgumentParser()

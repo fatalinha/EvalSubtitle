@@ -19,21 +19,19 @@ system_name=$3
 tl=$4
 
 SCRIPTDIR="$(dirname $0)/../evalsub/util/mwer-utils"
-SEGDIR="/home/${USER}/mwerSegmenter" #$(dirname $0)/../evalsub/util/mwerSegmenter
+SEGDIR="/home/${USER}/mwerSegmenter3" 
 OUTDIR="$(dirname $0)/output"
 mkdir -p "$OUTDIR"
 
 
 # check if MWER is downloaded
-if test -f "/home/${USER}/mwerSegmenter"; then #'$SEGDIR/segmentBasedOnMWER.sh'; then
+if test -f "/home/${USER}/mwerSegmenter3"; then 
   echo "MWER segmenter exists"
 else
   echo "Installing MWER first"
   current_location=$(pwd)
   cd "/home/${USER}/" #$(dirname $0)/../evalsub/util/
-  git clone https://github.com/PeganovAnton/mwerSegmenter.git
-  #wget https://github.com/PeganovAnton/mwerSegmenter/raw/main/mwerSegmenter
-  #wget https://raw.githubusercontent.com/PeganovAnton/mwerSegmenter/main/segmentBasedOnMWER.sh
+  git clone https://github.com/fatalinha/mwerSegmenter3.git
   cd "$current_location"
 fi
 
